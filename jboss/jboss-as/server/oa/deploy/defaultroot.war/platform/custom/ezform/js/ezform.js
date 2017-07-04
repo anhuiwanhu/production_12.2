@@ -459,6 +459,9 @@ function addRow(ind, isInvoke) {
 							document.getElementsByName(_field_name+_new_ran_1+"_Id")[0].value='';
 						}else if(_showtype_=='105'){
 							document.getElementsByName(_field_name+"selecttext")[ri].value = '';//105
+						}else if(_showtype_=='115'){
+							document.getElementsByName(_field_name+_new_ran_1+"_fileName")[0].value='';
+							document.getElementsByName(_field_name+_new_ran_1+"_saveName")[0].value='';
 						}else{
 							document.getElementsByName(_field_name)[ri].value = '';
 						}

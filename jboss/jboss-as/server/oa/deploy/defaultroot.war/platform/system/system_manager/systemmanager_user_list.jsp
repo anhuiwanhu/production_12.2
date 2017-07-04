@@ -514,8 +514,7 @@ function renderOperate(po,i){
         }
     </s:if>
     <s:elseif test="status == 'disabled'">
-    	
-        html += '<img src="<%=rootPath%>/images/quash.gif" title="恢复" onClick="javascript:recoverDisable('+po.empId+','+po.mobileUserFlag+','+po.enterprisenumber+');" >';
+        html += '<img src="<%=rootPath%>/images/quash.gif" title="恢复" onClick="javascript:recoverDisable('+po.empId+','+(po.mobileUserFlag!=null && po.mobileUserFlag!="" ? po.mobileUserFlag : "0") +','+(po.enterprisenumber!=null && po.enterprisenumber!="" ? po.enterprisenumber : "0")+');" >';
     </s:elseif>
     <s:elseif test="status == 'sleep'">
         html += '<img src="<%=rootPath%>/images/quash.gif" title="恢复" onClick="javascript:recoverSleep('+po.empId+');">';
