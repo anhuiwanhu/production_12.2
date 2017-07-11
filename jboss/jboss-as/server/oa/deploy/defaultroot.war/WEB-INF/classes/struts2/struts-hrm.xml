@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC 
+	"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN" 
+	"http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="com.whir.ezoffice.hrm.hr" extends="whir">
+        <action name="employee!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmployeeAction">
+            <result name="incumbent_list">/modules/hrm/hr/employee/incumbent_list.jsp</result>
+            <result name="incumbent_add">/modules/hrm/hr/employee/incumbent_add.jsp</result>
+            <result name="incumbent_modify">/modules/hrm/hr/employee/incumbent_modify.jsp</result>
+            <result name="incumbent_view">/modules/hrm/hr/employee/incumbent_view.jsp</result>
+            <result name="incumbent_mycard">/modules/hrm/hr/employee/incumbent_mycard.jsp</result>
+            <result name="history_list">/modules/hrm/hr/employee/history_list.jsp</result>
+            <result name="expirationofcontract_emp_list">/modules/hrm/hr/employee/expirationofcontract_emp_list.jsp</result>
+            <result name="birthdaycoming_emp_list">/modules/hrm/hr/employee/birthdaycoming_emp_list.jsp</result>
+            <result name="residencedueto_emp_list">/modules/hrm/hr/employee/residencedueto_emp_list.jsp</result>
+            <result name="probationdueto_emp_list">/modules/hrm/hr/employee/probationdueto_emp_list.jsp</result>
+            <result name="underling_emp_list">/modules/hrm/hr/employee/underling_emp_list.jsp</result>
+            <result name="org_view">/modules/hrm/hr/employee/org_view.jsp</result>
+            <result name="user_view">/modules/hrm/hr/employee/user_view.jsp</result>
+        </action>
+        <action name="hrImport!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.HrExcelImport">
+        </action>
+        
+        <action name="partyinfo!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.PartyInfoAction">
+            <result name="partymember_list">/modules/hrm/hr/partyinfo/partymember_list.jsp</result>
+            <result name="partymember_modify">/modules/hrm/hr/partyinfo/partymember_modify.jsp</result>
+            <result name="partymember_show">/modules/hrm/hr/partyinfo/partymember_show.jsp</result>
+            <result name="partymember_turnout">/modules/hrm/hr/partyinfo/partymember_turnout.jsp</result>
+            <result name="partymember_turnout_modify">/modules/hrm/hr/partyinfo/partymember_turnout_modify.jsp</result>
+            <result name="partymember_turnout_list">/modules/hrm/hr/partyinfo/partymember_turnout_list.jsp</result>
+            <result name="partymember_turnout_show">/modules/hrm/hr/partyinfo/partymember_turnout_show.jsp</result>
+        </action>
+        
+        <action name="empchange!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmpchangeAction">
+            <result name="list">/modules/hrm/hr/empchange/empchange_list.jsp</result>
+            <result name="add">/modules/hrm/hr/empchange/empchange_add.jsp</result>
+            <result name="modi">/modules/hrm/hr/empchange/empchange_modify.jsp</result>
+        </action>
+        
+        <action name="empedusty!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmployeeEdustyAction">
+            <result name="edusty_list">/modules/hrm/hr/empedusty/edusty_list.jsp</result>
+            <result name="edusty_add">/modules/hrm/hr/empedusty/edusty_add.jsp</result>
+            <result name="edusty_modify">/modules/hrm/hr/empedusty/edusty_modify.jsp</result>
+        </action>
+        <action name="familymember!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.FamilyMemberAction">
+            <result name="member_list">/modules/hrm/hr/familymember/member_list.jsp</result>
+            <result name="member_add">/modules/hrm/hr/familymember/member_add.jsp</result>
+            <result name="member_modify">/modules/hrm/hr/familymember/member_modify.jsp</result>
+        </action>
+        
+        <action name="emergencycontact!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmergencyContactAction">
+            <result name="contact_list">/modules/hrm/hr/emergencycontact/contact_list.jsp</result>
+            <result name="contact_add">/modules/hrm/hr/emergencycontact/contact_add.jsp</result>
+            <result name="contact_modify">/modules/hrm/hr/emergencycontact/contact_modify.jsp</result>
+        </action>
+        
+        <action name="hrmorgstructure!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.OrgStructureAction">
+            <result name="orgstructure">/modules/hrm/hr/orgstructure/orgstructure.jsp</result>
+        </action>
+        
+        <action name="empcontract!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmployeeContractAction">
+            <result name="contract_list">/modules/hrm/hr/empcontract/contract_list.jsp</result>
+            <result name="contract_add">/modules/hrm/hr/empcontract/contract_add.jsp</result>
+            <result name="contract_modify">/modules/hrm/hr/empcontract/contract_modify.jsp</result>
+            <result name="contract_change_list">/modules/hrm/hr/empcontract/contract_change_list.jsp</result>
+            <result name="contract_generate">/modules/hrm/hr/empcontract/contract_generate.jsp</result>
+        </action>
+        
+        <action name="empwork!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmployeeWorkAction">
+            <result name="work_list">/modules/hrm/hr/empwork/work_list.jsp</result>
+            <result name="work_add">/modules/hrm/hr/empwork/work_add.jsp</result>
+            <result name="work_modify">/modules/hrm/hr/empwork/work_modify.jsp</result>
+        </action>
+        
+        <action name="rzxx!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.RzxxAction">
+            <result name="rzxx_list">/modules/hrm/hr/rzxx/rzxx_list.jsp</result>
+            <result name="rzxx_add">/modules/hrm/hr/rzxx/rzxx_add.jsp</result>
+            <result name="rzxx_modify">/modules/hrm/hr/rzxx/rzxx_modify.jsp</result>
+        </action>
+        
+        <action name="trainhistory!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmployeeTrainhistoryAction">
+            <result name="history_list">/modules/hrm/hr/trainhistory/history_list.jsp</result>
+            <result name="history_add">/modules/hrm/hr/trainhistory/history_add.jsp</result>
+            <result name="history_modify">/modules/hrm/hr/trainhistory/history_modify.jsp</result>
+        </action>
+        
+        <action name="empcompetence!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmployeeCompetenceAction">
+            <result name="competence_list">/modules/hrm/hr/empcompetence/competence_list.jsp</result>
+            <result name="competence_add">/modules/hrm/hr/empcompetence/competence_add.jsp</result>
+            <result name="competence_modify">/modules/hrm/hr/empcompetence/competence_modify.jsp</result>
+        </action>
+        
+        <action name="jobqualification!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.JobQualificationAction">
+            <result name="jobq_list">/modules/hrm/hr/jobqualification/jobq_list.jsp</result>
+            <result name="jobq_add">/modules/hrm/hr/jobqualification/jobq_add.jsp</result>
+            <result name="jobq_modify">/modules/hrm/hr/jobqualification/jobq_modify.jsp</result>
+        </action>
+        
+        <action name="vocationqulification!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.VocationQulificationAction">
+            <result name="vocationq_list">/modules/hrm/hr/vocationqulification/vocationq_list.jsp</result>
+            <result name="vocationq_add">/modules/hrm/hr/vocationqulification/vocationq_add.jsp</result>
+            <result name="vocationq_modify">/modules/hrm/hr/vocationqulification/vocationq_modify.jsp</result>
+        </action>
+        
+         <action name="train!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.TrainRecordAction">
+            <result name="card_record_list">/modules/hrm/hr/train/card_record_list.jsp</result>
+            <result name="train_record_list">/modules/hrm/hr/train/train_record_list.jsp</result>
+            <result name="train_record_add">/modules/hrm/hr/train/train_record_add.jsp</result>
+            <result name="train_record_modify">/modules/hrm/hr/train/train_record_modify.jsp</result>
+            <result name="train_record_show">/modules/hrm/hr/train/train_record_show.jsp</result>
+         </action>
+         
+         <action name="hortationpunish!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.HprecordAction">
+            <result name="card_record_list">/modules/hrm/hr/hortationpunish/card_record_list.jsp</result>
+            <result name="hp_record_list">/modules/hrm/hr/hortationpunish/hp_record_list.jsp</result>
+            <result name="hp_record_add">/modules/hrm/hr/hortationpunish/hp_record_add.jsp</result>
+            <result name="hp_record_modify">/modules/hrm/hr/hortationpunish/hp_record_modify.jsp</result>
+            <result name="hp_record_show">/modules/hrm/hr/hortationpunish/hp_record_show.jsp</result>
+         </action>
+         
+         <action name="performancecheck!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.PerformanceCheckAction">
+            <result name="card_record_list">/modules/hrm/hr/performancecheck/card_record_list.jsp</result>
+            <result name="pfcheck_list">/modules/hrm/hr/performancecheck/pfcheck_record_list.jsp</result>
+            <result name="pfcheck_add">/modules/hrm/hr/performancecheck/pfcheck_record_add.jsp</result>
+            <result name="pfcheck_modify">/modules/hrm/hr/performancecheck/pfcheck_record_modify.jsp</result>
+         </action>
+         
+         <action name="inhabitancy!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmpInhabitancyAction">
+            <result name="card_record_list">/modules/hrm/hr/inhabitancy/card_record_list.jsp</result>
+            <result name="inhabitancy_record_list">/modules/hrm/hr/inhabitancy/inhabitancy_record_list.jsp</result>
+            <result name="inhabitancy_record_add">/modules/hrm/hr/inhabitancy/inhabitancy_record_add.jsp</result>
+            <result name="inhabitancy_record_modify">/modules/hrm/hr/inhabitancy/inhabitancy_record_modify.jsp</result>
+         </action>
+         
+         <action name="socialinsurance!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmpSocialinsuranceAction">
+            <result name="card_record_list">/modules/hrm/hr/socialinsurance/card_record_list.jsp</result>
+            <result name="soc_record_list">/modules/hrm/hr/socialinsurance/soc_record_list.jsp</result>
+            <result name="soc_record_add">/modules/hrm/hr/socialinsurance/soc_record_add.jsp</result>
+            <result name="soc_record_modify">/modules/hrm/hr/socialinsurance/soc_record_modify.jsp</result>
+            <result name="soc_record_show">/modules/hrm/hr/socialinsurance/soc_record_show.jsp</result>
+         </action>
+         
+         <action name="empcompo!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmpCompoAction">
+            <result name="card_record_list">/modules/hrm/hr/empcompo/card_record_list.jsp</result>
+            <result name="empcompo_record_export">/modules/hrm/hr/empcompo/empcompo_record_export.jsp</result>
+            <result name="empcompo_record_list">/modules/hrm/hr/empcompo/empcompo_record_list.jsp</result>
+            <result name="empcompo_record_add">/modules/hrm/hr/empcompo/empcompo_record_add.jsp</result>
+            <result name="empcompo_record_modify">/modules/hrm/hr/empcompo/empcompo_record_modify.jsp</result>
+            <result name="empcompo_record_show">/modules/hrm/hr/empcompo/empcompo_record_show.jsp</result>
+         </action>
+         
+         <action name="unitsetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.UnitSettingAction">
+            <result name="unitsetting_list">/modules/hrm/hr/unitsetting/unitsetting_list.jsp</result>
+            <result name="unitsetting_add">/modules/hrm/hr/unitsetting/unitsetting_add.jsp</result>
+            <result name="unitsetting_modify">/modules/hrm/hr/unitsetting/unitsetting_modify.jsp</result>
+         </action>
+         
+         <action name="deptkindsetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.DeptKindSettingAction">
+            <result name="deptkind_list">/modules/hrm/hr/deptkind/deptkind_list.jsp</result>
+            <result name="deptkind_add">/modules/hrm/hr/deptkind/deptkind_add.jsp</result>
+            <result name="deptkind_modify">/modules/hrm/hr/deptkind/deptkind_modify.jsp</result>
+         </action>
+         
+         <action name="partysetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.PartySettingAction">
+            <result name="partysetting_list">/modules/hrm/hr/partyinfo/partysetting_list.jsp</result>
+            <result name="partysetting_add">/modules/hrm/hr/partyinfo/partysetting_add.jsp</result>
+            <result name="partysetting_modify">/modules/hrm/hr/partyinfo/partysetting_modify.jsp</result>
+         </action>
+         
+         <!-- 职务设置 -->
+         <action name="dutysetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.DutySettingAction">
+            <result name="dutysetting_list">/modules/hrm/hr/duty/dutysetting_list.jsp</result>
+            <result name="dutysetting_add">/modules/hrm/hr/duty/dutysetting_add.jsp</result>
+            <result name="dutysetting_modify">/modules/hrm/hr/duty/dutysetting_modify.jsp</result>
+            <result name="dutysetting_show">/modules/hrm/hr/duty/dutysetting_show.jsp</result>
+         </action>
+         
+         <action name="stationsetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.StationSettingAction">
+            <result name="stationsetting_list">/modules/hrm/hr/station/stationsetting_list.jsp</result>
+            <result name="stationsetting_add">/modules/hrm/hr/station/stationsetting_add.jsp</result>
+            <result name="stationsetting_modify">/modules/hrm/hr/station/stationsetting_modify.jsp</result>
+            <result name="stationsetting_show">/modules/hrm/hr/station/stationsetting_show.jsp</result>
+         </action>
+         
+         <action name="personalpositionsetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.PersonalPositionSettingAction">
+            <result name="personalpositionsetting_list">/modules/hrm/hr/personalposition/personalpositionsetting_list.jsp</result>
+            <result name="personalpositionsetting_add">/modules/hrm/hr/personalposition/personalpositionsetting_add.jsp</result>
+            <result name="personalpositionsetting_modify">/modules/hrm/hr/personalposition/personalpositionsetting_modify.jsp</result>
+         </action>
+         
+         <action name="empchangesetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmpchangeSettingAction">
+            <result name="empchangesetting_list">/modules/hrm/hr/empchange/empchangesetting_list.jsp</result>
+            <result name="empchangesetting_add">/modules/hrm/hr/empchange/empchangesetting_add.jsp</result>
+            <result name="empchangesetting_modify">/modules/hrm/hr/empchange/empchangesetting_modify.jsp</result>
+         </action>
+         
+         <!-- 课程分类设置 -->
+         <action name="trainclasssetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.TrainclassSettingAction">
+            <result name="trainclasssetting_list">/modules/hrm/hr/trainclass/trainclasssetting_list.jsp</result>
+            <result name="trainclasssetting_add">/modules/hrm/hr/trainclass/trainclasssetting_add.jsp</result>
+            <result name="trainclasssetting_modify">/modules/hrm/hr/trainclass/trainclasssetting_modify.jsp</result>
+         </action>
+         
+         <action name="sysdictsetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.SysdictSettingAction">
+            <result name="sysdictsetting_list">/modules/hrm/hr/sysdict/sysdictsetting_list.jsp</result>
+            <result name="sysdictsetting_add">/modules/hrm/hr/sysdict/sysdictsetting_add.jsp</result>
+            <result name="sysdictsetting_modify">/modules/hrm/hr/sysdict/sysdictsetting_modify.jsp</result>
+            <result name="selectList">/modules/hrm/hr/sysdict/sysdictsetting_select_list.jsp</result>
+         </action>
+         
+         <action name="hortationpunishsetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.HortationpunishSettingAction">
+            <result name="hortationpunishsetting_list">/modules/hrm/hr/hortationpunish/hortationpunishsetting_list.jsp</result>
+            <result name="hortationpunishsetting_show">/modules/hrm/hr/hortationpunish/hortationpunishsetting_show.jsp</result>
+            <result name="hortationpunishsetting_add">/modules/hrm/hr/hortationpunish/hortationpunishsetting_add.jsp</result>
+            <result name="hortationpunishsetting_modify">/modules/hrm/hr/hortationpunish/hortationpunishsetting_modify.jsp</result>
+         </action>
+         
+         <action name="workaddress!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.WorkAddressAction">
+            <result name="workAddress_list">/modules/hrm/hr/workaddress/workAddress_list.jsp</result>
+            <result name="workAddress_list_select">/modules/hrm/hr/workaddress/workAddress_list_select.jsp</result>
+            <result name="workAddress_add">/modules/hrm/hr/workaddress/workAddress_add.jsp</result>
+            <result name="workAddress_modify">/modules/hrm/hr/workaddress/workAddress_modify.jsp</result>
+            <result name="workAddress_show">/modules/hrm/hr/workaddress/workAddress_show.jsp</result>
+			<result name="workAddress_list_selectSingle">/modules/hrm/hr/workaddress/workAddress_list_selectSingle.jsp</result>
+         </action>
+         
+		 <action name="workaddresstype!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.WorkAddressTypeAction">
+            <result name="workaddresstype_list">/modules/hrm/hr/workaddresstype/workaddresstype_list.jsp</result>
+            <result name="workaddresstype_add">/modules/hrm/hr/workaddresstype/workaddresstype_add.jsp</result>
+            <result name="workaddresstype_modify">/modules/hrm/hr/workaddresstype/workaddresstype_modify.jsp</result>
+         </action>
+         
+         <action name="personalkindsetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.PersonalkindSettingAction">
+            <result name="personalkindsetting_list">/modules/hrm/hr/personalkind/personalkindsetting_list.jsp</result>
+            <result name="personalkindsetting_add">/modules/hrm/hr/personalkind/personalkindsetting_add.jsp</result>
+            <result name="personalkindsetting_modify">/modules/hrm/hr/personalkind/personalkindsetting_modify.jsp</result>
+         </action>
+         
+         <action name="persontypesetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.PersontypeSettingAction">
+            <result name="persontypesetting_list">/modules/hrm/hr/persontype/persontypesetting_list.jsp</result>
+            <result name="persontypesetting_add">/modules/hrm/hr/persontype/persontypesetting_add.jsp</result>
+            <result name="persontypesetting_modify">/modules/hrm/hr/persontype/persontypesetting_modify.jsp</result>
+         </action>
+         
+         <action name="empcontractsetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmpcontractSettingAction">
+            <result name="empcontractsetting_list">/modules/hrm/hr/empcontract/empcontractsetting_list.jsp</result>
+            <result name="empcontractsetting_add">/modules/hrm/hr/empcontract/empcontractsetting_add.jsp</result>
+            <result name="empcontractsetting_modify">/modules/hrm/hr/empcontract/empcontractsetting_modify.jsp</result>
+         </action>
+         
+         <!-- 到期提醒设置 -->
+         <action name="remindsetting!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.RemindSettingAction">
+            <result name="remindsetting_modify">/modules/hrm/hr/remind/unitsetting_modify.jsp</result>
+         </action>
+         
+         <action name="hrempattend!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.EmpAttendanceAction">
+           	<result name="hrempattend_export">/modules/hrm/hr/empattendance/hrempattend_export.jsp</result>
+           	<result name="hrempattend_list">/modules/hrm/hr/empattendance/hrempattend_list.jsp</result>
+           	<result name="hrempattend_add">/modules/hrm/hr/empattendance/hrempattend_add.jsp</result>
+           	<result name="hrempattend_modify">/modules/hrm/hr/empattendance/hrempattend_modify.jsp</result>
+         </action>
+         
+         <action name="hrextension!*" method="{1}" class="com.whir.ezoffice.hrm.hr.actionsupport.ExtensionAction">
+           	<result name="filed_list">/platform/custom/extension/filed_list.jsp</result>
+           	<result name="filed_add">/platform/custom/extension/filed_add.jsp</result>
+           	<result name="filed_modify">/platform/custom/extension/filed_modify.jsp</result>
+         </action>
+    </package>
+    
+    <!-- 统计报表 -->
+    <package name="com.whir.ezoffice.hrm.report" extends="whir">
+		<action name="hrmempstatistics!*" method="{1}" class="com.whir.ezoffice.hrm.report.actionsupport.EmpStatisticsAction">
+           <result name="empstatistics">/modules/hrm/report/default/empstatistics.jsp</result>
+           <result name="empstatistics_change">/modules/hrm/report/default/empstatistics_change.jsp</result>
+           
+           <result name="empstatistics_struct">/modules/hrm/report/default/empstatistics_struct.jsp</result>
+           <result name="empstatistics_struct_pie">/modules/hrm/report/default/empstatistics_struct_pie.jsp</result>
+           <result name="empstatistics_struct_histogram">/modules/hrm/report/default/empstatistics_struct_histogram.jsp</result>
+           
+           <result name="empstatistics_lizhi">/modules/hrm/report/default/empstatistics_lizhi.jsp</result>
+           <result name="empstatistics_trainrecord">/modules/hrm/report/default/empstatistics_trainrecord.jsp</result>
+           <result name="empstatistics_trainrecord_month">/modules/hrm/report/default/empstatistics_trainrecord_month.jsp</result>
+           <result name="empstatistics_trainrecord_dept">/modules/hrm/report/default/empstatistics_trainrecord_dept.jsp</result>
+           <result name="empstatistics_trainrecord_course">/modules/hrm/report/default/empstatistics_trainrecord_course.jsp</result>
+           <result name="empstatistics_trainrecord_year">/modules/hrm/report/default/empstatistics_trainrecord_year.jsp</result>
+           <result name="empstatistics_hprecord">/modules/hrm/report/default/empstatistics_hprecord.jsp</result>
+           
+           <result name="empstatistics_province">/modules/hrm/report/default/empstatistics_province.jsp</result>
+           <result name="empstatistics_province_pie">/modules/hrm/report/default/empstatistics_province_pie.jsp</result>
+           <result name="empstatistics_province_histogram">/modules/hrm/report/default/empstatistics_province_histogram.jsp</result>
+           
+           <result name="empstatistics_ryjz">/modules/hrm/report/default/empstatistics_ryjz.jsp</result>
+           
+           <result name="empstatistics_gwlz">/modules/hrm/report/default/empstatistics_gwlz.jsp</result>
+           <result name="empstatistics_gwlz_line">/modules/hrm/report/default/empstatistics_gwlz_line.jsp</result>
+           <result name="empstatistics_gwlz_histogram">/modules/hrm/report/default/empstatistics_gwlz_histogram.jsp</result>
+           
+           <result name="empstatistics_zhlz">/modules/hrm/report/default/empstatistics_zhlz.jsp</result>
+           
+           <result name="empstatistics_change_data">/modules/hrm/report/default/empstatistics_change_data.jsp</result>
+           <result name="empstatistics_struct_data">/modules/hrm/report/default/empstatistics_struct_data.jsp</result>
+           <result name="empstatistics_lizhi_data">/modules/hrm/report/default/empstatistics_lizhi_data.jsp</result>
+           <result name="empstatistics_trainrecord_data">/modules/hrm/report/default/empstatistics_trainrecord_data.jsp</result>
+           <result name="empstatistics_trainrecord_month_data">/modules/hrm/report/default/empstatistics_trainrecord_month_data.jsp</result>
+           <result name="empstatistics_trainrecord_dept_data">/modules/hrm/report/default/empstatistics_trainrecord_dept_data.jsp</result>
+           <result name="empstatistics_trainrecord_course_data">/modules/hrm/report/default/empstatistics_trainrecord_course_data.jsp</result>
+           <result name="empstatistics_trainrecord_year_data">/modules/hrm/report/default/empstatistics_trainrecord_year_data.jsp</result>
+           <result name="empstatistics_hprecord_data">/modules/hrm/report/default/empstatistics_hprecord_data.jsp</result>
+           <result name="empstatistics_province_data">/modules/hrm/report/default/empstatistics_province_data.jsp</result>
+           <result name="empstatistics_ryjz_data">/modules/hrm/report/default/empstatistics_ryjz_data.jsp</result>
+           <result name="empstatistics_gwlz_data">/modules/hrm/report/default/empstatistics_gwlz_data.jsp</result>
+           <result name="empstatistics_zhlz_data">/modules/hrm/report/default/empstatistics_zhlz_data.jsp</result>
+           
+           <result name="empstatistics_change_export">/modules/hrm/report/default/empstatistics_change_export.jsp</result>
+           <result name="empstatistics_struct_export">/modules/hrm/report/default/empstatistics_struct_export.jsp</result>
+           <result name="empstatistics_lizhi_export">/modules/hrm/report/default/empstatistics_lizhi_export.jsp</result>
+           <result name="empstatistics_trainrecord_export">/modules/hrm/report/default/empstatistics_trainrecord_export.jsp</result>
+           <result name="empstatistics_trainrecord_month_export">/modules/hrm/report/default/empstatistics_trainrecord_month_export.jsp</result>
+           <result name="empstatistics_trainrecord_dept_export">/modules/hrm/report/default/empstatistics_trainrecord_dept_export.jsp</result>
+           <result name="empstatistics_trainrecord_course_export">/modules/hrm/report/default/empstatistics_trainrecord_course_export.jsp</result>
+           <result name="empstatistics_trainrecord_year_export">/modules/hrm/report/default/empstatistics_trainrecord_year_export.jsp</result>
+           <result name="empstatistics_hprecord_export">/modules/hrm/report/default/empstatistics_hprecord_export.jsp</result>
+           <result name="empstatistics_province_export">/modules/hrm/report/default/empstatistics_province_export.jsp</result>
+           <result name="empstatistics_ryjz_export">/modules/hrm/report/default/empstatistics_ryjz_export.jsp</result>
+           <result name="empstatistics_gwlz_export">/modules/hrm/report/default/empstatistics_gwlz_export.jsp</result>
+           <result name="empstatistics_zhlz_export">/modules/hrm/report/default/empstatistics_zhlz_data.jsp</result>
+        </action>
+        
+		<action name="hrmcustomizereport!*" method="{1}" class="com.whir.ezoffice.hrm.report.actionsupport.CustomizeReportAction">
+           <result name="customize_query">/modules/hrm/report/customize/customize_query.jsp</result>
+           <result name="customize_show">/modules/hrm/report/customize/customize_show.jsp</result>
+           <result name="customize_export">/modules/hrm/report/customize/customize_export.jsp</result>
+        </action>
+	</package>
+	
+    <package name="com.whir.ezoffice.hrm.kq" extends="whir">
+        <action name="kqrecordimp!*" method="{1}" class="com.whir.ezoffice.hrm.kq.actionsupport.KQRecordImpAction">
+           	<result name="kqrecordimp_list">/modules/hrm/kq/recordimp/kqrecordimp_list.jsp</result>
+           	<result name="setpaidleave">/modules/hrm/kq/kqpaidleave_set.jsp</result>
+        </action>
+        
+        <action name="kqrecord!*" method="{1}" class="com.whir.ezoffice.hrm.kq.actionsupport.KQRecordAction">
+           <result name="kqrecord_list">/modules/hrm/kq/record/kqrecord_list.jsp</result>
+           <result name="kqrecord_list_old">/modules/hrm/kq/record/kqrecord_list_old.jsp</result>
+           <result name="kqrecord_modify">/modules/hrm/kq/record/kqrecord_modify.jsp</result>
+           <result name="kqrecord_list_modify">/modules/hrm/kq/record/kqrecord_list_modify.jsp</result>
+           <result name="kqrecord_statistics_query">/modules/hrm/kq/record/kqrecord_statistics_query.jsp</result>
+           <result name="kqrecord_statistics_show">/modules/hrm/kq/record/kqrecord_statistics_show.jsp</result>
+           <result name="kqrecored_detail">/modules/hrm/kq/record/kqrecored_detail.jsp</result>
+        </action>
+        
+        <action name="kqimp!*" method="{1}"    class="com.whir.ezoffice.hrm.kq.actionsupport.KQImportAction">
+           <result name="kqrecordimp_list">/modules/hrm/kq/imp/kqrecordimp_list.jsp</result>
+           <result name="kqrecordimp_show">/modules/hrm/kq/imp/kqrecordimp_show.jsp</result>
+        </action>
+        
+        <action name="kquser!*" method="{1}" class="com.whir.ezoffice.hrm.kq.actionsupport.KQUserAction">
+           <result name="kquser_list">/modules/hrm/kq/kquser/kquser_list.jsp</result>
+           <result name="kquser_modify">/modules/hrm/kq/kquser/kquser_modify.jsp</result>
+		   <result name="kquser_exportKqUser">/modules/hrm/kq/kquser/kq_user_export.jsp</result>
+        </action>
+        
+        <action name="kqspeuser!*" method="{1}" class="com.whir.ezoffice.hrm.kq.actionsupport.SpecialUserAction">
+           <result name="kqspeuser_list">/modules/hrm/kq/specialuser/kqspeuser_list.jsp</result>
+           <result name="kqspeuser_add">/modules/hrm/kq/specialuser/kqspeuser_add.jsp</result>
+           <result name="kqspeuser_modify">/modules/hrm/kq/specialuser/kqspeuser_modify.jsp</result>
+        </action>
+        
+        <action name="kqleavetype!*" method="{1}" class="com.whir.ezoffice.hrm.kq.actionsupport.KQLeaveTypeAction">
+           <result name="kqleavetype_list">/modules/hrm/kq/leavetype/kqleavetype_list.jsp</result>
+           <result name="kqleavetype_add">/modules/hrm/kq/leavetype/kqleavetype_add.jsp</result>
+           <result name="kqleavetype_modify">/modules/hrm/kq/leavetype/kqleavetype_modify.jsp</result>
+        </action>
+        
+        <action name="kqworktime!*" method="{1}" class="com.whir.ezoffice.hrm.kq.actionsupport.KQWorkTimeAction">
+           <result name="kqworktime_list">/modules/hrm/kq/worktime/kqworktime_list.jsp</result>
+           <result name="kqworktime_add">/modules/hrm/kq/worktime/kqworktime_add.jsp</result>
+           <result name="kqworktime_modify">/modules/hrm/kq/worktime/kqworktime_modify.jsp</result>
+        </action>
+         <action name="kqrule!*" method="{1}" class="com.whir.ezoffice.hrm.kq.actionsupport.KQRuleAction">
+           <result name="kqrule_list">/modules/hrm/kq/rule/kqrule_list.jsp</result>
+           <result name="kqrule_add">/modules/hrm/kq/rule/kqrule_add.jsp</result>
+            <result name="kqrule_modify">/modules/hrm/kq/rule/kqrule_modify.jsp</result>
+           <result name="kqrule_show">/modules/hrm/kq/rule/kqrule_show.jsp</result>
+        </action>
+        
+        <action name="kqworkflow!*" method="{1}" class="com.whir.ezoffice.hrm.kq.actionsupport.KQWorkflowAction">
+           <result name="myleavestatus_list">/modules/hrm/kq/kqworkflow/myleavestatus_list.jsp</result>
+           <result name="myleave_list">/modules/hrm/kq/kqworkflow/myleave_list.jsp</result>
+           <result name="mycancelleave_list">/modules/hrm/kq/kqworkflow/mycancelleave_list.jsp</result>
+           <result name="mytravel_list">/modules/hrm/kq/kqworkflow/mytravel_list.jsp</result>
+           <result name="myovertime_list">/modules/hrm/kq/kqworkflow/myovertime_list.jsp</result>
+           <result name="apply_list">/modules/hrm/kq/kqworkflow/apply_list.jsp</result>
+           <result name="mypaidleave_list">/modules/hrm/kq/kqworkflow/mypaidleave_list.jsp</result>
+        </action>
+	</package>
+	
+	<package name="com.whir.ezoffice.hrm.cardmanager" extends="whir">
+		<action name="hrmfestalcard!*" method="{1}" class="com.whir.ezoffice.hrm.card.actionsupport.FestalCardAction">
+           <result name="festivalcard_list">/modules/hrm/cardmanager/festalcard/festivalcard_list.jsp</result>
+           <result name="festivalcard_add">/modules/hrm/cardmanager/festalcard/festivalcard_add.jsp</result>
+           <result name="festivalcard_modify">/modules/hrm/cardmanager/festalcard/festivalcard_modify.jsp</result>
+           <result name="festivalcard_show">/modules/hrm/cardmanager/festalcard/festivalcard_show.jsp</result>
+        </action>
+        
+		<action name="hrmbirthcard!*" method="{1}" class="com.whir.ezoffice.hrm.card.actionsupport.BirthCardAction">
+           <result name="birthdaycard_list">/modules/hrm/cardmanager/birthdaycard/birthdaycard_list.jsp</result>
+           <result name="birthdaycard_add">/modules/hrm/cardmanager/birthdaycard/birthdaycard_add.jsp</result>
+           <result name="birthdaycard_modify">/modules/hrm/cardmanager/birthdaycard/birthdaycard_modify.jsp</result>
+           <result name="birthdaycard_show">/modules/hrm/cardmanager/birthdaycard/birthdaycard_show.jsp</result>
+        </action>
+	</package>
+	
+	<package name="com.whir.ezoffice.hrm.examination" extends="whir">
+		<action name="hrmexamselftest!*" method="{1}" class="com.whir.ezoffice.hrm.examination.actionsupport.ExaminationSelfTestAction">
+           <result name="hrmexamselftest_add">/modules/hrm/examination/hrmexamselftest_add.jsp</result>
+           <result name="hrmexamselftest_paper">/modules/hrm/examination/hrmexamselftest_paper.jsp</result>
+           <result name="hrmexamselftest_result_detail">/modules/hrm/examination/hrmexamselftest_result_detail.jsp</result>
+           <result name="hrmexamselftest_list">/modules/hrm/examination/hrmexamselftest_list.jsp</result>
+        </action>
+        
+		<action name="hrmexammy!*" method="{1}" class="com.whir.ezoffice.hrm.examination.actionsupport.ExaminationMyPaperAction">
+           <result name="hrmexammy_list">/modules/hrm/examination/hrmexammy_list.jsp</result>
+        </action>
+        
+		<action name="hrmexammanage!*" method="{1}" class="com.whir.ezoffice.hrm.examination.actionsupport.ExaminationManageAction">
+           <result name="paper_list">/modules/hrm/examination/paper_list.jsp</result>
+           <result name="paper_add">/modules/hrm/examination/paper_add.jsp</result>
+           <result name="paper_modify">/modules/hrm/examination/paper_modify.jsp</result>
+           <result name="paper_list_answer">/modules/hrm/examination/paper_list_answer.jsp</result>
+        </action>
+        
+		<action name="hrmexamstock!*" method="{1}" class="com.whir.ezoffice.hrm.examination.actionsupport.ExaminationStockAction">
+           <result name="hrmexamstock_list">/modules/hrm/examination/hrmexamstock_list.jsp</result>
+           <result name="hrmexamstock_add">/modules/hrm/examination/hrmexamstock_add.jsp</result>
+           <result name="hrmexamstock_modify">/modules/hrm/examination/hrmexamstock_modify.jsp</result>
+           <result name="hrmexamstock_show">/modules/hrm/examination/hrmexamstock_show.jsp</result>
+           <result name="hrmexamstock_select">/modules/hrm/examination/hrmexamstock_select.jsp</result>
+        </action>
+        
+		<action name="hrmexamtype!*" method="{1}" class="com.whir.ezoffice.hrm.examination.actionsupport.ExaminationTypeAction">
+           <result name="hrmexamtype_list">/modules/hrm/examination/hrmexamtype_list.jsp</result>
+           <result name="hrmexamtype_add">/modules/hrm/examination/hrmexamtype_add.jsp</result>
+           <result name="hrmexamtype_modify">/modules/hrm/examination/hrmexamtype_modify.jsp</result>
+        </action>
+	</package>
+	
+	
+	
+	<package name="com.whir.ezoffice.hrm.socialfund" extends="whir">
+		<action name="hrmratiosetting!*" method="{1}" class="com.whir.ezoffice.hrm.socialfund.actionsupport.RatioSettingAction">
+           <result name="hrmratiosetting_modify">/modules/hrm/socialfund/ratiosetting/hrmratiosetting_modify.jsp</result>
+           <result name="hrmratiosetting_list">/modules/hrm/socialfund/ratiosetting/hrmratiosetting_list.jsp</result>
+        </action>
+		
+		<action name="hrmchangerecord!*" method="{1}" class="com.whir.ezoffice.hrm.socialfund.actionsupport.ChangeRecordAction">
+           <result name="hrmchangerecord_query">/modules/hrm/socialfund/changerecord/hrmchangerecord_query.jsp</result>
+           <result name="hrmchangerecord_show">/modules/hrm/socialfund/changerecord/hrmchangerecord_show.jsp</result>
+           <result name="hrmchangerecord_export">/modules/hrm/socialfund/changerecord/hrmchangerecord_export.jsp</result>
+        </action>
+		
+		<action name="hrmsbgjjtz!*" method="{1}" class="com.whir.ezoffice.hrm.socialfund.actionsupport.SbgjjtzAction">
+           <result name="hrmsbgjjtz_query">/modules/hrm/socialfund/sbgjjtz/hrmsbgjjtz_query.jsp</result>
+           <result name="hrmsbgjjtz_show">/modules/hrm/socialfund/sbgjjtz/hrmsbgjjtz_show.jsp</result>
+           <result name="hrmsbgjjtz_export">/modules/hrm/socialfund/sbgjjtz/hrmsbgjjtz_export.jsp</result>
+           <result name="hrmsbgjjtz_show2">/modules/hrm/socialfund/sbgjjtz/hrmsbgjjtz_show2.jsp</result>
+           <result name="hrmsbgjjtz_export2">/modules/hrm/socialfund/sbgjjtz/hrmsbgjjtz_export2.jsp</result>
+        </action>
+	</package>
+	
+	<package name="com.whir.ezoffice.hrm.salary" extends="whir">
+		<action name="hrmgzjl!*" method="{1}" class="com.whir.ezoffice.hrm.salary.actionsupport.GzjlAction">
+           <result name="hrmgzjl_add">/modules/hrm/salary/gzjl/hrmgzjl_add.jsp</result>
+           <result name="hrmgzjl_inputdata">/modules/hrm/salary/gzjl/hrmgzjl_inputdata.jsp</result>
+           <result name="hrmgzjl_modify">/modules/hrm/salary/gzjl/hrmgzjl_modify.jsp</result>
+           <result name="hrmgzjl_export">/modules/hrm/salary/gzjl/hrmgzjl_export.jsp</result>
+           <result name="hrmgzjl_exportdata">/modules/hrm/salary/gzjl/hrmgzjl_exportdata.jsp</result>
+           <result name="hrmgzjl_show">/modules/hrm/salary/gzjl/hrmgzjl_show.jsp</result>
+           <result name="hrmgzjl_send">/modules/hrm/salary/gzjl/hrmgzjl_send.jsp</result>
+           <result name="hrmgzjl_setgzt">/modules/hrm/salary/gzjl/hrmgzjl_setgzt.jsp</result>
+           <result name="hrmgzjl_gzt_show">/modules/hrm/salary/gzjl/hrmgzjl_gzt_show.jsp</result>
+           <result name="hrmgzjl_list">/modules/hrm/salary/gzjl/hrmgzjl_list.jsp</result>
+           <result name="hrmgzjl_list_my">/modules/hrm/salary/gzjl/hrmgzjl_list_my.jsp</result>
+           <result name="hrmgzjl_tz_query">/modules/hrm/salary/gzjl/hrmgzjl_tz_query.jsp</result>
+           <result name="hrmgzjl_tz_show">/modules/hrm/salary/gzjl/hrmgzjl_tz_show.jsp</result>
+           <result name="hrmgzjl_tz_export">/modules/hrm/salary/gzjl/hrmgzjl_tz_export.jsp</result>
+        </action>
+        
+		<action name="hrmgzxm!*" method="{1}" class="com.whir.ezoffice.hrm.salary.actionsupport.GzxmAction">
+           <result name="hrmgzxm_modify">/modules/hrm/salary/gzxm/hrmgzxm_modify.jsp</result>
+           <result name="hrmgzxm_list">/modules/hrm/salary/gzxm/hrmgzxm_list.jsp</result>
+        </action>
+        
+		<action name="hrmgzdj!*" method="{1}" class="com.whir.ezoffice.hrm.salary.actionsupport.GzdjAction">
+           <result name="hrmgzdj_add">/modules/hrm/salary/gzdj/hrmgzdj_add.jsp</result>
+           <result name="hrmgzdj_modify">/modules/hrm/salary/gzdj/hrmgzdj_modify.jsp</result>
+           <result name="hrmgzdj_list">/modules/hrm/salary/gzdj/hrmgzdj_list.jsp</result>
+        </action>
+        
+		<action name="hrmgzbz!*" method="{1}" class="com.whir.ezoffice.hrm.salary.actionsupport.GzbzAction">
+           <result name="hrmgzbz_add">/modules/hrm/salary/gzbz/hrmgzbz_add.jsp</result>
+           <result name="hrmgzbz_modify">/modules/hrm/salary/gzbz/hrmgzbz_modify.jsp</result>
+           <result name="hrmgzbz_list">/modules/hrm/salary/gzbz/hrmgzbz_list.jsp</result>
+        </action>
+        
+		<action name="hrmincometaxratio!*" method="{1}" class="com.whir.ezoffice.hrm.salary.actionsupport.IncomeTaxRatioAction">
+           <result name="hrmincometaxratio_add">/modules/hrm/salary/incometax/hrmincometaxratio_add.jsp</result>
+        </action>
+		
+		<action name="hrmfffs!*" method="{1}" class="com.whir.ezoffice.hrm.salary.actionsupport.FffsAction">
+           <result name="hrmfffs_add">/modules/hrm/salary/fffs/hrmfffs_add.jsp</result>
+        </action>
+	</package>
+</struts>

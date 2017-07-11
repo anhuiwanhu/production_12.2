@@ -30,3 +30,38 @@
 4、执行数据库升级脚本（分oralce、sqlserver两种类型库）
 
 5、清服务端缓存，启动OA服务，验证系统功能
+
+
+
+
+
+
+
+
+
+
+
+1、停OA服务
+
+2、备份生产环境程序、数据库
+
+3、覆盖产品补丁包到OA安装目录d:\jboss
+
+4、修改defaultroot\WEB-INF\classes\ServiceParse.xml文件（检查勿重），
+
+在标签c7（<class>com.whir.service.parse.PersonParse</class>）中新增：
+ <method>updatePerson</method>
+
+在标签c22（com.whir.service.parse.BPMParse）中新增：
+ <method>bpm_saveDraftComment</method>
+
+
+5、修改../defaultroot.war/WEB-INF/config/hibernate/hibernate.cfg.xml文件，新增(检查勿重复）：
+
+<mapping resource="com/whir/ezoffice/netdisk/po/oalocktablepo.hbm.xml"/>
+
+6、把文件夹../defaultroot.war/WEB-INF/lib/com拖入到whir_common.jar中（勿解压）
+
+7、执行数据库升级脚本（分oralce、sqlserver两种类型库）
+
+8、清服务端缓存，启动OA服务，验证系统功能
