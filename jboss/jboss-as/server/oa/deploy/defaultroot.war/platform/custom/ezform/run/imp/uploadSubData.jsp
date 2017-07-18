@@ -137,7 +137,7 @@ try {
                         }else{
                             String tempData = ((Cell) sheet.getCell(k++, row)).getContents();
 							String reg = "^[+-]?\\d+(\\.\\d+)?$";
-							if(tempData.startsWith("0") && !tempData.substring(1,2).equals(".")){
+							if(tempData.startsWith("0") && tempData.length()>1 && !tempData.substring(1,2).equals(".")){
 								if(tempData != null && !"".equals(tempData) && !"null".equals(tempData)){
 									if("number".equals(_typeArr[j])){
 										Double.parseDouble(tempData);//校验数值型
@@ -149,9 +149,10 @@ try {
 								}
 								data += tempData;
 							}else if(tempData.matches(reg)){
-								NumberCell numberCell = (NumberCell)sheet.getCell(k-1, row);
-								double namberValue = numberCell.getValue();
-								tempData = namberValue+"";
+								//使用double会导致科学计数法错误
+								//NumberCell numberCell = (NumberCell)sheet.getCell(k-1, row);
+								//double namberValue = numberCell.getValue();
+								//tempData = namberValue+"";
 								if(tempData.indexOf(".")!=-1){
 									if(Long.valueOf(tempData.split("\\.")[1])==0){
 										tempData = tempData.split("\\.")[0];

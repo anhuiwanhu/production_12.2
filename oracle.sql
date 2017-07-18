@@ -45,3 +45,14 @@ comment on column oa_locktable.lockdate is
 commit;
 insert into oa_patchinfo (patch_id,patch_editinfo,patch_name,patch_version,patch_time) values(hibernate_sequence.nextval,'Wanhu ezOFFICE','12.2.0.03_SP_20170710','12.2.0.03',sysdate);
 commit;
+
+
+
+
+
+
+
+
+
+insert into oa_patchinfo (patch_id,patch_editinfo,patch_name,patch_version,patch_time) values(hibernate_sequence.nextval,'Wanhu ezOFFICE','12.2.0.04_SP_20170717','12.2.0.04',sysdate);
+commit;
