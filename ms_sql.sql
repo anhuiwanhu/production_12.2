@@ -39,3 +39,18 @@ go
 
 insert into oa_patchinfo (patch_editinfo,patch_name,patch_version,patch_time) values('Wanhu ezOFFICE','12.2.0.04_SP_20170717','12.2.0.04',getdate());
 go
+
+
+
+
+
+
+
+
+
+alter  table  GOV_ORGASSISTANT  add  createEmp  bigint;
+go
+alter  table   GOV_ORGASSISTANT  add  createOrg  bigint;
+go
+insert into oa_patchinfo (patch_editinfo,patch_name,patch_version,patch_time) values('Wanhu ezOFFICE','12.2.0.05_SP_20170724','12.2.0.05',getdate());
+go

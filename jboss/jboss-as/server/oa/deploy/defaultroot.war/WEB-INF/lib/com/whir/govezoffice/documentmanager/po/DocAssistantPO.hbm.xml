@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 2.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+<hibernate-mapping>
+	<class name="com.whir.govezoffice.documentmanager.po.DocAssistantPO" schema="EZOFFICE" table="GOV_ORGASSISTANT">
+
+		<id column="ID" name="id" type="java.lang.Long">
+			<generator class="native"/>
+		</id>
+		<property name="userIds" column="USERIDS" />
+		<property name="userNames" column="USERNAMES" />
+		<property name="orgIds" column="ORGIDS"/>
+		<property name="orgNames" column="ORGNAMES"/>
+		<property name="createTime" column="CREATETIME"/>
+		<property name="createEmp" column="CREATEEMP" />
+		<property name="createOrg" column="CREATEORG" />
+	</class>
+</hibernate-mapping>

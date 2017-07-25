@@ -170,16 +170,30 @@ String local = session.getAttribute("org.apache.struts.action.LOCALE").toString(
 						}
 					}
 
-					//如果跟默认活动想同 就默认选中
-					if(avo.getActivityId().equals(defaultActivity)||gateType.equals("XX")){
-						checkedStr="checked";
-					}else{
-						checkedStr="";
-					}
+				
 
 					//并行活动 还是 "checked  onclick='return   false;'";
 					if(!gateType.equals("XAND")){
 						checkreturn="onclick=\"checkOnclikFun(this,'"+avo.getActivityId()+"',0,'"+inputType+"');\"";
+					}
+
+					 //包含网关  默认选中   必须选中
+					if(gateType.equals("XX")){
+						if(avo.getDefaultChooseType()!=null&&avo.getDefaultChooseType().equals("1")){
+							checkedStr="checked";
+						}else{
+							checkedStr="";
+						} 
+
+						if(avo.getMustChooseType()!=null&&avo.getMustChooseType().equals("1")){
+							checkreturn="onclick=\"XANDcheckFun(this);checkOnclikFun(this,'"+avo.getActivityId()+"',0,'"+inputType+"');\"";
+							checkedStr="checked";
+						}  
+					//如果跟默认活动想同 就默认选中
+					}else if(avo.getActivityId().equals(defaultActivity)){
+						checkedStr="checked";
+					}else{
+						checkedStr="";
 					}
 					
 					//子流程的结束活动不需要选

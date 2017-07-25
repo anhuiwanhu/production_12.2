@@ -40,10 +40,10 @@ try {
 		arr[1] = ((Cell) sheet.getCell(1, 0)).getContents();
 		arr[2] = ((Cell) sheet.getCell(2, 0)).getContents();
 		arr[3] = ((Cell) sheet.getCell(3, 0)).getContents();
-		if(!arr[0].trim().equals("考勤编号")||!arr[1].trim().equals("人员账号")  || !arr[2].trim().equals("考勤类别") ||  !arr[3].trim().equals("人员名称")){
-			out.print("文件格式不正确！");
-			return ;
-		}
+		//if(!arr[0].trim().equals("考勤编号")||!arr[1].trim().equals("人员账号")  || !arr[2].trim().equals("考勤类别") ||  !arr[3].trim().equals("人员名称")){
+		//	out.print("文件格式不正确！");
+		//	return ;
+		//}
 		
 		for (int row = 1; row < rowCount; row++) {
         	String[] valArr = new String[43];
@@ -77,6 +77,9 @@ try {
 	        if("-1".equals(flag)){
 				//flag =flag.substring(0,flag.lastIndexOf(","));
 				out.print("导入为空！");
+			}else if(flag.indexOf("2$")>-1){
+				String[] flagArr =flag.split("\\$");
+				out.print("考勤编号 "+flagArr[1]+" 重复了");
 			}else{
 				out.print("success");
 			}
@@ -100,6 +103,7 @@ public String saveData(List list, String userId, String orgId, String domainId,S
     }
 	KQBD kqbd = new KQBD();
     List pList = new ArrayList();
+    List tList = new ArrayList();
     String notimpdata ="";
     for(int i=0; i<list.size(); i++){
         String[] valArr = (String[])list.get(i);
@@ -107,9 +111,11 @@ public String saveData(List list, String userId, String orgId, String domainId,S
         	continue;
         }
         //KQRecordImpPO po = new KQRecordImpPO();
+        tList.add(valArr[0].trim());
 		KQUserPO po = new KQUserPO();
         //po.setKqCode(valArr[3].trim());
 		List list_ = kqbd.getEmpIdAndOrgidByKqcode(valArr[0].trim());
+		System.out.println("------------------------:list_--------"+list_.size());
 		if(list_ !=null &&  list_.size()>0){
 			//if(notimpdata.indexOf(valArr[2].trim()) <0){
 			//	notimpdata +=valArr[2].trim() +",";
@@ -117,7 +123,8 @@ public String saveData(List list, String userId, String orgId, String domainId,S
 			continue;
 		}
 		List userList = kqbd.getUserOrgInfoByUserAccount(valArr[1].trim());
-		if(userList != null && userList.size() >0){
+		System.out.println("------------------------:userList--------"+userList.size());
+		if(userList != null && userList.size() >0 && userList.size()<2){
 			Object[] arr = (Object[])userList.get(0);
 			String kqType  = getKqType(valArr[2].trim());     
 	        po.setEmpId(new Long(arr[1].toString()));
@@ -128,21 +135,39 @@ public String saveData(List list, String userId, String orgId, String domainId,S
 	        pList.add(po);
 		}
     }
+   
+		//判断导入的数据考勤编号是否重复
+		String  r="1";
+		String  code="";
+		for(int i=0;i<tList.size();i++){			
+			for(int j=i+1;j<tList.size();j++){				
+				if(tList.get(i).equals(tList.get(j))){
+					r="0";
+					code=tList.get(i).toString();					
+				}			
+			}
+		}
+		// System.out.println("------------------------:重复编码code--------"+code);
+		  System.out.println("------------------------:pList.size()--------"+pList.size());
     if(pList !=null && pList.size()>0){
-    	result = String.valueOf(kqbd.saveKQUser(pList));
-    }else{
+		
+		if("1".equals(r)){
+			result = String.valueOf(kqbd.saveKQUser(pList));
+		}else{
+			//System.out.println("------------------------:考勤编号重复--------"+code);
+			result="2$"+code;
+		}
+    	
+    }else if("0".equals(r)){
+		result="2$"+code;
+	}else{
     	result = "-1";
     }
+	
     return result;
 }
 
-public Float toFloat(String val){
-    try{
-        return new Float(val);
-    }catch(Exception e){
-    }
-    return null;
-}
+
 
 //获取
 public String getKqType(String type){
@@ -161,32 +186,5 @@ public String getKqType(String type){
         return result;
 }
 
-//日期
-public Date getDate(String date){
-	//System.out.println(date);
-    if(date==null||"".equals(date)||"null".equals(date))return null;
-    try{
-        date = date.replaceAll("-","/");
-        return new Date(date);
-    }catch(Exception e){
-    	e.printStackTrace();
-    }
-    return null;
-}
 
-//格式化日期yyyy-MM-dd
-public String formatDate(String date){
-    if(date==null||"".equals(date)||"null".equals(date)){
-    	return null;
-    }
-    try{
-        date = date.replaceAll("-","/");
-        java.util.Date dd = new java.util.Date(date);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    	return sdf.format(dd);
-    }catch(Exception e){
-    	e.printStackTrace();
-    }
-    return null;
-}
 %>

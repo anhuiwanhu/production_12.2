@@ -227,6 +227,8 @@ String formCode=request.getParameter("formCode")==null?"":com.whir.component.sec
 				whir_alert("编辑的连接线已经不存在！",function(){});
 				return;
 			}
+     
+
             var old_conditionExpressionDisplay= model.getConditionExpressionDisplay(); 
 			if(old_conditionExpressionDisplay!=null&&old_conditionExpressionDisplay.indexOf("{")>=0&&old_conditionExpressionDisplay.indexOf("}")>=0){
 				needJudge=false;
@@ -238,10 +240,8 @@ String formCode=request.getParameter("formCode")==null?"":com.whir.component.sec
 			$("#name").attr("value", model.getText());
 			$("#name").attr("defaultValue", model.getText());
 
-
-
-			$("#sortNum").attr("defaultValue",model.getSortNum());
-			$("#sortNum").val(model.getSortNum());
+			//设置额外的排序码等信息
+			setExtInfo(model);
 			//条件表达式
 			// document.all.conditionExpression.value+=" "+stext+" " ;
 			// document.all.expressname.value+=" "+ svalue+" " ;
@@ -851,10 +851,10 @@ String formCode=request.getParameter("formCode")==null?"":com.whir.component.sec
 			}
 			//名称
 			//model.setText($("input[name='name']").attr("value")); 
-			model.setText($("#name").attr("value"));
- 
+			model.setText($("#name").attr("value")); 
+            //保存额外的排序码等信息
+			saveExtInfo(model);
 
-			model.setSortNum($("#sortNum").val());
 			//条件表达式
 			var condition = $("input[name='conditionExpression']").attr("value");
 			if(condition != null && condition.length > 0){
@@ -966,6 +966,57 @@ String formCode=request.getParameter("formCode")==null?"":com.whir.component.sec
 	   function  wfchooseData(){
 		  selectnameFun();
 	   }
+
+
+       //从流程图中取出 排序码  是否必选  是否默认选中 等信息	
+	   function setExtInfo(model){
+
+		    //连线的开始节点
+			var ffffrommetaNodeModel = model.getFromMetaNodeModel();  
+            //互斥网关  与 包含网关
+			if(ffffrommetaNodeModel.type=="INCLUSIVEGATEWAY_NODE"){ 
+				$("#baohanwangguansetspan").show();
+			}else{ 
+				$("#baohanwangguansetspan").hide();
+			}
+
+		   	$("#sortNum").attr("defaultValue",model.getSortNum());
+			$("#sortNum").val(model.getSortNum());
+
+			var  mustChooseType=model.getMustChooseType();
+			var  defaultChooseType=model.getDefaultChooseType();
+
+			if(defaultChooseType!=null&&defaultChooseType=="1"){
+				$("#checkbox_DefaultChoose").attr("checked",'true'); 
+			}
+
+			if(mustChooseType!=null&&mustChooseType=="1"){
+				$("#checkbox_MustChoose").attr("checked",'true'); 
+			}
+
+
+	   }
+
+	   //从流程图中取出 排序码  是否必选  是否默认选中 等信息	
+	   function saveExtInfo(model){
+		   model.setSortNum($("#sortNum").val()); 
+		   if ($("#checkbox_DefaultChoose").attr('checked')) {
+			    model.setDefaultChooseType("1");
+		   }else{
+			   model.setDefaultChooseType("0");
+		   }
+		   if ($("#checkbox_MustChoose").attr('checked')) {
+			   model.setMustChooseType("1");
+		   }else{
+			    model.setMustChooseType("0");
+		   }
+					   
+	   }
+
+	   function defaultChooseFun(){
+	   }
+	   function mustChooseFun(){
+	   }
 	//-->
 	</SCRIPT>
 </head>
@@ -990,12 +1041,12 @@ String formCode=request.getParameter("formCode")==null?"":com.whir.component.sec
 				<tr>
 				    <td for='排序' width="75px" class="td_lefttitle">排序<!-- 排序 -->：</td>
 					<td> 
-					  <input type="text" name="sortNum"  id="sortNum"  class="inputText" style="width:98%" value="" 
+					  <input type="text" name="sortNum"  id="sortNum"  class="inputText" style="width:50%" value="" 
 					   whir-options="vtype:[{'maxLength':4},'p_integer']" > 
+					  <span id="baohanwangguansetspan">  <input type="checkbox"  id="checkbox_DefaultChoose" name="checkbox_DefaultChoose" onClick="defaultChooseFun();">条件满足时默认选中&nbsp;   <input type="checkbox"  id="checkbox_MustChoose" name="checkbox_MustChoose" onClick="mustChooseFun();">条件满足时必须选中</span>
 					</td>
 					<td nowrap>&nbsp;</td>
-				</tr>
-				
+				</tr> 
 				<tr>
 				    <td for='<bean:message bundle="workflow" key="workflow.expressdisplayname"/>' class="td_lefttitle" valign="top" id="td_expressname"><bean:message bundle="workflow" key="workflow.expressdisplayname"/><!-- 表达式 -->：</td>
 					<td>

@@ -56,3 +56,23 @@ commit;
 
 insert into oa_patchinfo (patch_id,patch_editinfo,patch_name,patch_version,patch_time) values(hibernate_sequence.nextval,'Wanhu ezOFFICE','12.2.0.04_SP_20170717','12.2.0.04',sysdate);
 commit;
+
+
+
+
+
+
+
+
+
+
+alter table GOV_ORGASSISTANT add createEmp number(20);
+commit;
+comment  on  column GOV_ORGASSISTANT.CreateEmp is '创建人id';
+commit;
+alter table GOV_ORGASSISTANT add createOrg number(20);
+commit;
+comment  on  column GOV_ORGASSISTANT.createOrg is '创建人所属组织id';
+commit;
+insert into oa_patchinfo (patch_id,patch_editinfo,patch_name,patch_version,patch_time) values(hibernate_sequence.nextval,'Wanhu ezOFFICE','12.2.0.05_SP_20170724','12.2.0.05',sysdate);
+commit;
