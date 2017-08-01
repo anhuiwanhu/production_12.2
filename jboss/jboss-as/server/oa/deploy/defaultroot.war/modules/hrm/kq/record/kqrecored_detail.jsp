@@ -55,14 +55,17 @@
 			 <div class="form-group col-wh-12 syfw" id="tr_yearDays">
                <label class="col-wh-2 control-label"  style="padding-right:0;width:120px;">签到来源：</label>
                <div class="input-group form-group  col-wh-8">
-			       <% if (String.valueOf(objs[4]).equals("1")){%>
+			         <% if (String.valueOf(objs[4]).equals("1")){%>
                      <span>微信</span>
 					 <%}%>
 					  <% if (String.valueOf(objs[4]).equals("2")){%>
-                     <span>EVO</span>
+                     <span>EVO移动门户</span>
 					 <%}%>
 					  <% if (String.valueOf(objs[4]).equals("3")){%>
                      <span>钉钉</span>
+					 <%}%>
+					  <% if (String.valueOf(objs[4]).equals("4")){%>
+                     <span>EVO客户端</span>
 					 <%}%>
                </div>
              </div>

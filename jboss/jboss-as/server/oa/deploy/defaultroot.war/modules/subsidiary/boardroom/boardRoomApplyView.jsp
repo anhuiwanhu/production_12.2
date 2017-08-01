@@ -152,7 +152,7 @@
 							  <li class="aon"  id="Panle0"><a href="javascript:void(0);" onClick="changePanle(0);" >基本信息</a></li>
 							  
 							  <%
-								if( !boardRoomApplyPO.getDirectlyPublish().equals("1") ){//不是直接发布
+								if(boardRoomApplyPO.getDirectlyPublish()==null || !boardRoomApplyPO.getDirectlyPublish().equals("1") ){//不是直接发布
 							  %>
 							  <li id="Panle1"><a href="javascript:void(0);" onClick="changePanle(1);">流程图</a></li> 
                               <li id="Panle2" ><a href="javascript:void(0);" onClick="changePanle(2);">流程记录</a></li>

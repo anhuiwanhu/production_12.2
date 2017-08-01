@@ -54,3 +54,13 @@ alter  table   GOV_ORGASSISTANT  add  createOrg  bigint;
 go
 insert into oa_patchinfo (patch_editinfo,patch_name,patch_version,patch_time) values('Wanhu ezOFFICE','12.2.0.05_SP_20170724','12.2.0.05',getdate());
 go
+
+
+
+
+
+
+
+
+insert into oa_patchinfo (patch_editinfo,patch_name,patch_version,patch_time) values('Wanhu ezOFFICE','12.2.0.06_SP_20170731','12.2.0.06',getdate());
+go

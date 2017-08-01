@@ -76,3 +76,13 @@ comment  on  column GOV_ORGASSISTANT.createOrg is '创建人所属组织id';
 commit;
 insert into oa_patchinfo (patch_id,patch_editinfo,patch_name,patch_version,patch_time) values(hibernate_sequence.nextval,'Wanhu ezOFFICE','12.2.0.05_SP_20170724','12.2.0.05',sysdate);
 commit;
+
+
+
+
+
+
+
+
+insert into oa_patchinfo (patch_id,patch_editinfo,patch_name,patch_version,patch_time) values(hibernate_sequence.nextval,'Wanhu ezOFFICE','12.2.0.06_SP_20170731','12.2.0.06',sysdate);
+commit;

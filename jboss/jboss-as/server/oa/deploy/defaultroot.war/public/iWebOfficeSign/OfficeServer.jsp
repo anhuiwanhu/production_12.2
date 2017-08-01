@@ -9,1324 +9,1371 @@
 <%@page import="com.whir.component.config.ConfigReader"%>
 <%@page import="com.whir.common.util.UploadFile"%>
 <%!
-  public class iWebOffice {
-    private int mFileSize;
-    private byte[] mFileBody;
-    private String mFileName;
-    private String mFileType;
-    private String mFileDate;
-    private String mFileID;
-    private String mRecordID;
-    private String mTemplate;
-    private String mDateTime;
-    private String mOption;
-    private String mMarkName;
-    private String mPassword;
-    private String mMarkList;
-    private String mBookmark;
-    private String mDescript;
-    private String mHostName;
-    private String mMarkGuid;
-    private String mCommand;
-    private String mContent;
-    private String mHtmlName;
-    private String mDirectory;
-    private String mFilePath;
-    private String mUserName;
-    private int mColumns;
-    private int mCells;
-    private String mMyDefine1;
-    private String mLocalFile;
-    private String mRemoteFile;
-    private String mLabelName;
-    private String mImageName;
-    private String mTableContent;
-    private String Sql;
-    //´òÓ¡¿ØÖÆ
-    private String mOfficePrints;
-    private int mCopies;
-    //×Ô¶¨ÒåĞÅÏ¢´«µİ
-    private String mInfo;
-    private DBstep.iMsgServer2000 MsgObj;
-    private DBstep.iDBManager2000 DbaObj;
+    public class iWebOffice {
+        private int mFileSize;
+        private byte[] mFileBody;
+        private String mFileName;
+        private String mFileType;
+        private String mFileDate;
+        private String mFileID;
+        private String mRecordID;
+        private String mTemplate;
+        private String mDateTime;
+        private String mOption;
+        private String mMarkName;
+        private String mPassword;
+        private String mMarkList;
+        private String mBookmark;
+        private String mDescript;
+        private String mHostName;
+        private String mMarkGuid;
+        private String mCommand;
+        private String mContent;
+        private String mHtmlName;
+        private String mDirectory;
+        private String mFilePath;
+        private String mUserName;
+        private int mColumns;
+        private int mCells;
+        private String mMyDefine1;
+        private String mLocalFile;
+        private String mRemoteFile;
+        private String mLabelName;
+        private String mImageName;
+        private String mTableContent;
+        private String Sql;
+        //æ‰“å°æ§åˆ¶
+        private String mOfficePrints;
+        private int mCopies;
+        //è‡ªå®šä¹‰ä¿¡æ¯ä¼ é€’
+        private String mInfo;
+        private DBstep.iMsgServer2000 MsgObj;
+        private DBstep.iDBManager2000 DbaObj;
+        private PreparedStatement tempstmt=null ;
+        private boolean tempFlag=false;
 
-    //==============================¡ıÎÄµµ¡¢Ä£°å¹ÜÀí´úÂë¡¾¿ªÊ¼¡¿¡ı==============================
-    //µ÷³öÎÄµµ£¬½«ÎÄµµÄÚÈİ±£´æÔÚmFileBodyÀï£¬ÒÔ±ã½øĞĞ´ò°ü
-    private boolean LoadFile() {
-      boolean mResult = false;
-      String Sql = "SELECT FileBody,FileSize FROM Document_File WHERE RecordID='" + mRecordID + "'";
-      try {
-        if (DbaObj.OpenConnection()) {
-          try {
-            ResultSet result = DbaObj.ExecuteQuery(Sql);
-            if (result.next()) {
-              try {
-                mFileBody = result.getBytes("FileBody");
-                if (result.wasNull()) {
-                  mFileBody = null;
+        //==============================â†“æ–‡æ¡£ã€æ¨¡æ¿ç®¡ç†ä»£ç ã€å¼€å§‹ã€‘â†“==============================
+        //è°ƒå‡ºæ–‡æ¡£ï¼Œå°†æ–‡æ¡£å†…å®¹ä¿å­˜åœ¨mFileBodyé‡Œï¼Œä»¥ä¾¿è¿›è¡Œæ‰“åŒ…
+        private boolean LoadFile() {
+            boolean mResult = false;
+            String Sql = "SELECT FileBody,FileSize FROM Document_File WHERE RecordID=? ";
+            try {
+                if (DbaObj.OpenConnection()) {
+                    try {
+                        tempstmt=DbaObj.Conn.prepareStatement(Sql);
+                        tempstmt.setString(1, mRecordID);
+                        ResultSet result = tempstmt.executeQuery();
+                        if (result.next()) {
+                            try {
+                                mFileBody = result.getBytes("FileBody");
+                                if (result.wasNull()) {
+                                    mFileBody = null;
+                                }
+                                mResult = true;
+                            }
+                            catch (Exception ex) {
+                                System.out.println(ex.toString());
+                            }
+                        }
+                        tempstmt.close();
+                        tempstmt=null;
+                        result.close();
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                        mResult = false;
+                    }
                 }
-                mResult = true;
-              }
-              catch (Exception ex) {
-                System.out.println(ex.toString());
-              }
             }
-            result.close();
-          }
-          catch (SQLException e) {
-            System.out.println(e.getMessage());
-            mResult = false;
-          }
+            finally {
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
         }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
 
-    //±£´æÎÄµµ£¬Èç¹ûÎÄµµ´æÔÚ£¬Ôò¸²¸Ç£¬²»´æÔÚ£¬ÔòÌí¼Ó
-    private boolean SaveFile() {
-		
-      boolean mResult = false;
-      int iFileId = -1;
-      String Sql = "SELECT * FROM Document_File WHERE RecordID='" + mRecordID + "'";
-      try {
-		 
-        if (DbaObj.OpenConnection()) {
-          try {
-			   
-            ResultSet result = DbaObj.ExecuteQuery(Sql);
-            if (result.next()) {
-				 
-      Sql = "update Document_File set RecordID=?,FileName=?,FileType=?,FileSize=?,"+
-	  "FileBody=?,FilePath=?,UserName=?,Descript=? WHERE RecordID='" + mRecordID + "'";
+        //ä¿å­˜æ–‡æ¡£ï¼Œå¦‚æœæ–‡æ¡£å­˜åœ¨ï¼Œåˆ™è¦†ç›–ï¼Œä¸å­˜åœ¨ï¼Œåˆ™æ·»åŠ 
+        private boolean SaveFile() {
+
+            boolean mResult = false;
+            int iFileId = -1;
+            String Sql = "SELECT * FROM Document_File WHERE RecordID=? ";
+            try {
+
+                if (DbaObj.OpenConnection()) {
+                    try {
+                        tempstmt=DbaObj.Conn.prepareStatement(Sql);
+                        tempstmt.setString(1,mRecordID);
+                        ResultSet result =tempstmt.executeQuery();
+                        if (result.next()) {
+                            tempFlag=true;
+                            Sql = "update Document_File set RecordID=?,FileName=?,FileType=?,FileSize=?,"+
+                                    "FileBody=?,FilePath=?,UserName=?,Descript=? WHERE RecordID= ? " ;
+                        }
+                        else {
+                            tempFlag=false;
+                            Sql = "insert into Document_File (RecordID,FileName,FileType,FileSize,FileBody,FilePath,UserName,Descript) values (?,?,?,?,?,?,?,? )";
+                        }
+                        tempstmt.close();
+                        tempstmt=null;
+                        result.close();
+                    }
+                    catch (SQLException e) {
+
+                        e.printStackTrace();
+                        mResult = false;
+                    }
+                    java.sql.PreparedStatement prestmt = null;
+                    try {
+
+                        prestmt = DbaObj.Conn.prepareStatement(Sql);
+                        prestmt.setString(1, mRecordID);
+                        prestmt.setString(2, mFileName);
+                        prestmt.setString(3, mFileType);
+                        prestmt.setInt(4, mFileSize);
+                        // prestmt.setString(4, mFileDate);
+                        prestmt.setBytes(5, mFileBody);
+                        prestmt.setString(6, mFilePath);
+                        prestmt.setString(7, mUserName);
+                        prestmt.setString(8, mDescript); //"é€šç”¨ç‰ˆæœ¬"
+                        if(tempFlag){
+                            prestmt.setString(9, mRecordID);
+                        }
+                        prestmt.execute();
+                        prestmt.close();
+                        mResult = true;
+                    }
+                    catch (SQLException e) {
+                        e.printStackTrace();
+                        mResult = false;
+                    }
+                }
             }
-            else {
-				 
-              Sql = "insert into Document_File (RecordID,FileName,FileType,FileSize,FileDate,FileBody,FilePath,UserName,Descript) values (?,?,?,?,?,?,?,?,? )";
+            finally {
+                DbaObj.CloseConnection();
             }
-			  
-            result.close();
-          }
-          catch (SQLException e) {
-			   
-            e.printStackTrace();
-            mResult = false;
-          }
-          java.sql.PreparedStatement prestmt = null;
-          try {
-			
-            prestmt = DbaObj.Conn.prepareStatement(Sql);
-            prestmt.setString(1, mRecordID);
-            prestmt.setString(2, mFileName);
-            prestmt.setString(3, mFileType);
-            prestmt.setInt(4, mFileSize);
-           // prestmt.setString(4, mFileDate);
-            prestmt.setBytes(5, mFileBody);
-            prestmt.setString(6, mFilePath);
-            prestmt.setString(7, mUserName);
-            prestmt.setString(8, mDescript); //"Í¨ÓÃ°æ±¾"
-            prestmt.execute();
-            prestmt.close();
+            return (mResult);
+        }
+
+        //è°ƒå‡ºæ¨¡æ¿æ–‡æ¡£ï¼Œå°†æ¨¡æ¿æ–‡æ¡£å†…å®¹ä¿å­˜åœ¨mFileBodyé‡Œï¼Œä»¥ä¾¿è¿›è¡Œæ‰“åŒ…
+        private boolean LoadTemplate() {
+            boolean mResult = false;
+            String Sql = "SELECT FileBody,FileSize FROM Template_File WHERE RecordID= ? ";
+            try {
+                if (DbaObj.OpenConnection()) {
+                    try {
+                        tempstmt=DbaObj.Conn.prepareStatement(Sql);
+                        tempstmt.setString(1,mTemplate);
+                        ResultSet result =tempstmt.executeQuery();
+                        if (result.next()) {
+                            try {
+                                mFileBody = result.getBytes("FileBody");
+                                if (result.wasNull()) {
+                                    mFileBody = null;
+                                }
+                                mResult = true;
+                            }
+                            catch (Exception ex) {
+                                System.out.println(ex.toString());
+                            }
+                        }
+                        tempstmt.close();
+                        tempstmt=null;
+                        result.close();
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                        mResult = false;
+                    }
+                }
+            }
+            finally {
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+
+        //ä¿å­˜æ¨¡æ¿æ–‡æ¡£ï¼Œå¦‚æœæ¨¡æ¿æ–‡æ¡£å­˜åœ¨ï¼Œåˆ™è¦†ç›–ï¼Œä¸å­˜åœ¨ï¼Œåˆ™æ·»åŠ 
+        private boolean SaveTemplate() {
+            boolean mResult = false;
+            int iFileId = -1;
+            String Sql = "SELECT * FROM Template_File WHERE RecordID= ? ";
+            try {
+                if (DbaObj.OpenConnection()) {
+                    try {
+
+                        tempstmt=DbaObj.Conn.prepareStatement(Sql);
+                        tempstmt.setString(1,mTemplate);
+                        ResultSet result =tempstmt.executeQuery();
+                        if (result.next()) {
+                            tempFlag=true;
+                            Sql = "update Template_File set RecordID=?,FileName=?,FileType=?,FileSize=?,FileDate=?,FileBody=?,FilePath=?,UserName=?,Descript=? WHERE RecordID= ? ";
+                        }
+                        else {
+                            tempFlag=false;
+                            Sql = "insert into Template_File (RecordID,FileName,FileType,FileSize,FileDate,FileBody,FilePath,UserName,Descript) values (?,?,?,?,?,?,?,?,? )";
+                        }
+                        tempstmt.close();
+                        tempstmt=null;
+                        result.close();
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.toString());
+                        mResult = false;
+                    }
+                    java.sql.PreparedStatement prestmt = null;
+                    try {
+                        prestmt = DbaObj.Conn.prepareStatement(Sql);
+                        prestmt.setString(1, mTemplate);
+                        prestmt.setString(2, mFileName);
+                        prestmt.setString(3, mFileType);
+                        prestmt.setInt(4, mFileSize);
+                        prestmt.setString(5, mFileDate);
+                        prestmt.setBytes(6, mFileBody);
+                        prestmt.setString(7, mFilePath);
+                        prestmt.setString(8, mUserName);
+                        prestmt.setString(9, mDescript); //"é€šç”¨ç‰ˆæœ¬"
+                        if(tempFlag){
+                            prestmt.setString(10, mTemplate); //"é€šç”¨ç‰ˆæœ¬"
+                        }
+                        prestmt.execute();
+                        prestmt.close();
+                        mResult = true;
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.toString());
+                        mResult = false;
+                    }
+                }
+            }
+            finally {
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+        //==============================â†‘æ–‡æ¡£ã€æ¨¡æ¿ç®¡ç†ä»£ç ã€ç»“æŸã€‘â†‘==============================
+
+
+        //==============================â†“ç‰ˆæœ¬ç®¡ç†ä»£ç ã€å¼€å§‹ã€‘â†“==============================
+        //åˆ—å‡ºæ‰€æœ‰ç‰ˆæœ¬ä¿¡æ¯
+        private boolean ListVersion() {
+            boolean mResult = false;
+            String Sql = "SELECT FileID,FileDate,UserName,Descript FROM Version_File WHERE RecordID= ? ";
+            mFileID = "\r\n";
+            mDateTime = "ä¿å­˜æ—¶é—´\r\n";
+            mUserName = "ç”¨æˆ·å\r\n";
+            mDescript = "ç‰ˆæœ¬è¯´æ˜\r\n";
+            try {
+                if (DbaObj.OpenConnection()) {
+                    try {
+                        tempstmt=DbaObj.Conn.prepareStatement(Sql);
+                        tempstmt.setString(1,mRecordID);
+                        ResultSet result =tempstmt.executeQuery();
+                        while (result.next()) {
+                            try {
+                                mFileID += String.valueOf(result.getInt("FileID")) + "\r\n"; //æ–‡ä»¶å·åˆ—è¡¨
+                                mDateTime += result.getString("FileDate") + "\r\n"; //æ—¥æœŸåˆ—è¡¨
+                                mUserName += result.getString("UserName") + "\r\n"; //ç”¨æˆ·ååˆ—è¡¨
+                                mDescript += result.getString("Descript") + "\r\n"; //å¦‚æœè¯´æ˜ä¿¡æ¯é‡Œæœ‰å›è½¦ï¼Œåˆ™å°†å›è½¦å˜æˆ>ç¬¦å·
+                            }
+                            catch (Exception ex) {
+                                System.out.println(ex.toString());
+                            }
+                        }
+                        tempstmt.close();
+                        tempstmt=null;
+                        result.close();
+                        mResult = true;
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                        mResult = false;
+                    }
+                }
+            }
+            finally {
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+
+        //è°ƒå…¥é€‰ä¸­ç‰ˆæœ¬ï¼Œé€šè¿‡æ–‡ä»¶å·è°ƒç”¨mFileID,å¹¶æŠŠæ–‡ä»¶æ”¾å…¥mFileBodyé‡Œï¼Œä»¥ä¾¿è¿›è¡Œæ‰“åŒ…
+        private boolean LoadVersion(String mFileID) {
+            boolean mResult = false;
+            String Sql = "SELECT FileBody,FileSize FROM Version_File WHERE RecordID= ? and  FileID= ? ";
+            try {
+                if (DbaObj.OpenConnection()) {
+                    try {
+                        tempstmt=DbaObj.Conn.prepareStatement(Sql);
+                        tempstmt.setString(1,mRecordID);
+                        tempstmt.setString(2,mFileID);
+                        ResultSet result =tempstmt.executeQuery();
+                        if (result.next()) {
+                            try {
+                                mFileBody = result.getBytes("FileBody");
+                                if (result.wasNull()) {
+                                    mFileBody = null;
+                                }
+                                mResult = true;
+                            }
+                            catch (Exception ex) {
+                                System.out.println(ex.toString());
+                            }
+                        }
+                        tempstmt.close();
+                        tempstmt=null;
+                        result.close();
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                        mResult = false;
+                    }
+                }
+            }
+            finally {
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+
+        //ä¿å­˜ç‰ˆæœ¬ï¼Œå°†è¯¥ç‰ˆæœ¬æ–‡ä»¶å­˜ç›˜ï¼Œå¹¶å°†è¯´æ˜ä¿¡æ¯ä¹Ÿä¿å­˜èµ·æ¥
+        private boolean SaveVersion() {
+            boolean mResult = false;
+            int iFileId = -1;
+            String Sql = "insert into Version_File (RecordID,FileName,FileType,FileSize,FileDate,FileBody,FilePath,UserName,Descript) values (?,?,?,?,?,?,?,?,? )";
+            try {
+                if (DbaObj.OpenConnection()) {
+                    java.sql.PreparedStatement prestmt = null;
+                    try {
+                        prestmt = DbaObj.Conn.prepareStatement(Sql);
+                        prestmt.setString(1, mRecordID);
+                        prestmt.setString(2, mFileName);
+                        prestmt.setString(3, mFileType);
+                        prestmt.setInt(4, mFileSize);
+                        prestmt.setString(5, mFileDate);
+                        prestmt.setBytes(6, mFileBody);
+                        prestmt.setString(7, mFilePath);
+                        prestmt.setString(8, mUserName);
+                        prestmt.setString(9, mDescript); //"é€šç”¨ç‰ˆæœ¬"
+                        prestmt.execute();
+                        prestmt.close();
+                        mResult = true;
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.toString());
+                        mResult = false;
+                    }
+                }
+            }
+            finally {
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+        //==============================â†‘ç‰ˆæœ¬ç®¡ç†ä»£ç ã€ç»“æŸã€‘â†‘==============================
+
+
+        //==============================â†“æ ‡ç­¾ç®¡ç†ä»£ç ã€å¼€å§‹ã€‘â†“==============================
+        //å–å¾—ä¹¦ç­¾åˆ—è¡¨
+        private boolean ListBookmarks() {
+            boolean mResult = false;
+            String Sql = "SELECT * FROM Bookmarks ";
+            mBookmark = "";
+            mDescript = "";
+            try {
+                if (DbaObj.OpenConnection()) {
+                    try {
+                        ResultSet result = DbaObj.ExecuteQuery(Sql);
+                        while (result.next()) {
+                            try {
+                                mBookmark += result.getString("BookMarkName") + "\r\n"; //ç”¨æˆ·ååˆ—è¡¨
+                                mDescript += result.getString("BookMarkDesc") + "\r\n"; //å¦‚æœè¯´æ˜ä¿¡æ¯é‡Œæœ‰å›è½¦ï¼Œåˆ™å°†å›è½¦å˜æˆ>ç¬¦å·
+                            }
+                            catch (Exception ex) {
+                                System.out.println(ex.toString());
+                            }
+                        }
+                        result.close();
+                        mResult = true;
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                        mResult = false;
+                    }
+                }
+            }
+            finally {
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+
+        //è£…å…¥ä¹¦ç­¾
+        private boolean LoadBookMarks() {
+            boolean mResult = false;
+            String Sql = " select b.BookMarkName,b.BookMarkText from Template_BookMarks a,BookMarks b where a.BookMarkname=b.BookMarkName and a.RecordID= ? ";
+            try {
+                if (DbaObj.OpenConnection()) {
+                    try {
+                        tempstmt=DbaObj.Conn.prepareStatement(Sql);
+                        tempstmt.setString(1,mTemplate);
+                        ResultSet result =tempstmt.executeQuery();
+                        while (result.next()) {
+                            try {
+                                //è¯´æ˜ï¼šæˆ‘ä»¬æµ‹è¯•ç¨‹åºæŠŠSQLè¯­å¥ç›´æ¥å†™åˆ°æ›¿æ¢æ ‡ç­¾å†…å®¹
+                                //å®é™…ä½¿ç”¨ä¸­ï¼Œè¿™ä¸ªæ ‡ç­¾å†…å®¹æ˜¯é€šè¿‡Sqlè¯­å¥å¾—åˆ°çš„ã€‚
+                                //ç”ŸæˆSQLæŸ¥è¯¢è¯­å¥  result.getString("BookMarkText") & "æ¡ä»¶"
+                                //å½“å‰çºªå½•å·ä½ mRecordID
+                                //BookMarkValue=ç”ŸæˆSQLè¿è¡Œç»“æœ
+                                String mBookMarkName = result.getString("BookMarkName");
+                                String mBookMarkValue = result.getString("BookMarkText");
+                                MsgObj.SetMsgByName(mBookMarkName, mBookMarkValue);
+                            }
+                            catch (Exception ex) {
+                                System.out.println(ex.toString());
+                            }
+                        }
+                        tempstmt.close();
+                        tempstmt=null;
+                        result.close();
+                        mResult = true;
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                        mResult = false;
+                    }
+                }
+            }
+            finally {
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+
+        //ä¿å­˜ä¹¦ç­¾
+        private boolean SaveBookMarks() {
+            boolean mResult = false;
+            String mBookMarkName;
+            int mIndex;
+            try {
+                if (DbaObj.OpenConnection()) {
+                    try {
+                        java.sql.PreparedStatement prestmt = null;
+                        String Sql = "DELETE FROM Template_BookMarks Where RecordID= ? ";
+                        prestmt = DbaObj.Conn.prepareStatement(Sql);
+                        prestmt.setString(1,mTemplate);
+                        prestmt.execute();
+
+                        prestmt.close();
+                        for (mIndex = 7; mIndex <= MsgObj.GetFieldCount() - 1; mIndex++) {
+                            java.sql.PreparedStatement prestmtx = null;
+                            mBookMarkName = MsgObj.GetFieldName(mIndex);
+                            Sql = "insert into Template_BookMarks (RecordId,BookMarkName) values (?,?)";
+                            prestmtx = DbaObj.Conn.prepareStatement(Sql);
+                            prestmtx.setString(1,mTemplate);
+                            prestmtx.setString(2,mBookMarkName);
+                            prestmtx.execute();
+                            prestmtx.close();
+                        }
+                        mResult = true;
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.toString());
+                        mResult = false;
+                    }
+                }
+            }
+            finally {
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+        //==============================â†‘æ ‡ç­¾ç®¡ç†ä»£ç ã€ç»“æŸã€‘â†‘==============================
+
+
+        //==============================â†“ç­¾ç« ç®¡ç†ä»£ç ã€å¼€å§‹ã€‘â†“==============================
+        //å–å¾—ç­¾ååˆ—è¡¨
+        private boolean LoadMarkList() {
+            String Sql = "SELECT MarkName FROM Signature";
+            mMarkList = "";
+            boolean mResult = false;
+            try {
+                if (DbaObj.OpenConnection()) {
+                    try {
+                        ResultSet result = DbaObj.ExecuteQuery(Sql);
+                        while (result.next()) {
+                            try {
+                                mMarkList += result.getString("MarkName") + "\r\n";
+                            }
+                            catch (Exception ex) {
+                                System.out.println(ex.toString());
+                            }
+                        }
+                        result.close();
+                        mResult = true;
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                        mResult = false;
+                    }
+                }
+            }
+            finally {
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+
+        //è°ƒå…¥ç­¾åçºªå½•
+        private boolean LoadMarkImage(String vMarkName, String vPassWord) {
+            String Sql = "SELECT MarkBody,MarkType FROM Signature WHERE MarkName= ? and PassWord= ? ";
+            boolean mResult = false;
+            try {
+                if (DbaObj.OpenConnection()) {
+                    try {
+                        tempstmt=DbaObj.Conn.prepareStatement(Sql);
+                        tempstmt.setString(1,vMarkName);
+                        tempstmt.setString(2,vPassWord);
+                        ResultSet result =tempstmt.executeQuery();
+                        if (result.next()) {
+                            try {
+                                mFileBody = result.getBytes("MarkBody");
+                                mFileType = result.getString("MarkType");
+                                mResult = true;
+                            }
+                            catch (Exception ex) {
+                                System.out.println(ex.toString());
+                            }
+                        }
+                        tempstmt.close();
+                        tempstmt=null;
+                        result.close();
+                    }
+                    catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                        mResult = false;
+                    }
+                }
+            }
+            finally {
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+
+        //ä¿å­˜ç­¾å
+        private boolean SaveSignature() {
+            boolean mResult = false;
+            String Sql = "insert into Document_Signature (RecordID,MarkName,UserName,DateTime,HostName,MarkGuid) values (?,?,?,?,?,? ) ";
+            if (DbaObj.OpenConnection()) {
+                java.sql.PreparedStatement prestmt = null;
+                try {
+                    prestmt = DbaObj.Conn.prepareStatement(Sql);
+                    prestmt.setString(1, mRecordID);
+                    prestmt.setString(2, mMarkName);
+                    prestmt.setString(3, mUserName);
+                    prestmt.setString(4, mDateTime);
+                    prestmt.setString(5, mHostName);
+                    prestmt.setString(6, mMarkGuid);
+                    prestmt.execute();
+                    prestmt.close();
+                    mResult = true;
+                }
+                catch (SQLException e) {
+                    System.out.println(e.toString() + Sql);
+                    mResult = false;
+                }
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+
+        //åˆ—å‡ºæ‰€æœ‰ç­¾å
+        private boolean LoadSignature() {
+            boolean mResult = false;
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String Sql = "SELECT MarkName,UserName,DateTime,HostName,MarkGuid FROM Document_Signature WHERE RecordID= ? ";
+            mMarkName = "å°ç« åç§°\r\n";
+            mUserName = "ç­¾åäºº\r\n";
+            mDateTime = "ç­¾ç« æ—¶é—´\r\n";
+            mHostName = "å®¢æˆ·ç«¯IP\r\n";
+            mMarkGuid = "åºåˆ—å·\r\n";
+            if (DbaObj.OpenConnection()) {
+                try {
+                    mResult = true;
+                    tempstmt=DbaObj.Conn.prepareStatement(Sql);
+                    tempstmt.setString(1,mRecordID);
+                    ResultSet result =tempstmt.executeQuery();
+                    while (result.next()) {
+                        mMarkName += result.getString("MarkName") + "\r\n"; //æ–‡ä»¶å·åˆ—è¡¨
+                        mUserName += result.getString("UserName") + "\r\n"; //æ—¥æœŸåˆ—è¡¨
+                        mDateTime += formatter.format(result.getTimestamp("DateTime")) + "\r\n";
+                        mHostName += result.getString("HostName") + "\r\n";
+                        mMarkGuid += result.getString("MarkGuid") + "\r\n";
+                    }
+                    tempstmt.close();
+                    tempstmt=null;
+                    result.close();
+                }
+                catch (Exception e) {
+                    System.out.println(e.toString());
+                    mResult = false;
+                }
+                DbaObj.CloseConnection();
+            }
+            return (mResult);
+        }
+        //==============================â†‘ç­¾ç« ç®¡ç†ä»£ç ã€ç»“æŸã€‘â†‘==============================
+
+
+        //==============================â†“æ‰©å±•åŠŸèƒ½ä»£ç ã€å¼€å§‹ã€‘â†“==============================
+        //è°ƒå‡ºæ‰€å¯¹åº”çš„æ–‡æœ¬
+        private boolean LoadContent() {
+            boolean mResult = false;
+            //æ‰“å¼€æ•°æ®åº“
+            //æ ¹æ® mRecordID æˆ– mFileName ç­‰ä¿¡æ¯
+            //æå–æ–‡æœ¬ä¿¡æ¯ä»˜ç»™mContentå³å¯ã€‚
+            //æœ¬æ¼”ç¤ºå‡è®¾å–å¾—çš„æ–‡æœ¬ä¿¡æ¯å¦‚ä¸‹ï¼š
+            mContent = "";
+            mContent += "æœ¬æ–‡çš„çºªå½•å·ï¼š" + mRecordID + "\n";
+            mContent += "æœ¬æ–‡çš„æ–‡ä»¶åï¼š" + mFileName + "\n";
+            mContent += "    è¿™ä¸ªéƒ¨åˆ†è¯·è‡ªå·±åŠ å…¥ï¼Œå’Œä½ ä»¬çš„æ•°æ®åº“ç»“åˆèµ·æ¥å°±å¯ä»¥äº†\n";
             mResult = true;
-          }
-          catch (SQLException e) {
-             e.printStackTrace();
-            mResult = false;
-          }
+            return (mResult);
         }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
 
-    //µ÷³öÄ£°åÎÄµµ£¬½«Ä£°åÎÄµµÄÚÈİ±£´æÔÚmFileBodyÀï£¬ÒÔ±ã½øĞĞ´ò°ü
-    private boolean LoadTemplate() {
-      boolean mResult = false;
-      String Sql = "SELECT FileBody,FileSize FROM Template_File WHERE RecordID='" + mTemplate + "'";
-      try {
-        if (DbaObj.OpenConnection()) {
-          try {
-            ResultSet result = DbaObj.ExecuteQuery(Sql);
-            if (result.next()) {
-              try {
-                mFileBody = result.getBytes("FileBody");
-                if (result.wasNull()) {
-                  mFileBody = null;
-                }
-                mResult = true;
-              }
-              catch (Exception ex) {
-                System.out.println(ex.toString());
-              }
-            }
-            result.close();
-          }
-          catch (SQLException e) {
-            System.out.println(e.getMessage());
-            mResult = false;
-          }
-        }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-
-    //±£´æÄ£°åÎÄµµ£¬Èç¹ûÄ£°åÎÄµµ´æÔÚ£¬Ôò¸²¸Ç£¬²»´æÔÚ£¬ÔòÌí¼Ó
-    private boolean SaveTemplate() {
-      boolean mResult = false;
-      int iFileId = -1;
-      String Sql = "SELECT * FROM Template_File WHERE RecordID='" + mTemplate + "'";
-      try {
-        if (DbaObj.OpenConnection()) {
-          try {
-            ResultSet result = DbaObj.ExecuteQuery(Sql);
-            if (result.next()) {
-              Sql = "update Template_File set RecordID=?,FileName=?,FileType=?,FileSize=?,FileDate=?,FileBody=?,FilePath=?,UserName=?,Descript=? WHERE RecordID='" + mTemplate + "'";
-            }
-            else {
-              Sql = "insert into Template_File (RecordID,FileName,FileType,FileSize,FileDate,FileBody,FilePath,UserName,Descript) values (?,?,?,?,?,?,?,?,? )";
-            }
-            result.close();
-          }
-          catch (SQLException e) {
-            System.out.println(e.toString());
-            mResult = false;
-          }
-          java.sql.PreparedStatement prestmt = null;
-          try {
-            prestmt = DbaObj.Conn.prepareStatement(Sql);
-            prestmt.setString(1, mTemplate);
-            prestmt.setString(2, mFileName);
-            prestmt.setString(3, mFileType);
-            prestmt.setInt(4, mFileSize);
-            prestmt.setString(5, mFileDate);
-            prestmt.setBytes(6, mFileBody);
-            prestmt.setString(7, mFilePath);
-            prestmt.setString(8, mUserName);
-            prestmt.setString(9, mDescript); //"Í¨ÓÃ°æ±¾"
-            prestmt.execute();
-            prestmt.close();
+        //ä¿å­˜æ‰€å¯¹åº”çš„æ–‡æœ¬
+        private boolean SaveContent() {
+            boolean mResult = false;
+            //æ‰“å¼€æ•°æ®åº“
+            //æ ¹æ® mRecordID æˆ– mFileName ç­‰ä¿¡æ¯
+            //æ’å…¥æ–‡æœ¬ä¿¡æ¯ mContenté‡Œçš„æ–‡æœ¬åˆ°æ•°æ®åº“ä¸­å³å¯ã€‚
             mResult = true;
-          }
-          catch (SQLException e) {
-            System.out.println(e.toString());
-            mResult = false;
-          }
+            return (mResult);
         }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-    //==============================¡üÎÄµµ¡¢Ä£°å¹ÜÀí´úÂë¡¾½áÊø¡¿¡ü==============================
 
-
-    //==============================¡ı°æ±¾¹ÜÀí´úÂë¡¾¿ªÊ¼¡¿¡ı==============================
-    //ÁĞ³öËùÓĞ°æ±¾ĞÅÏ¢
-    private boolean ListVersion() {
-      boolean mResult = false;
-      String Sql = "SELECT FileID,FileDate,UserName,Descript FROM Version_File WHERE RecordID='" + mRecordID + "'";
-      mFileID = "\r\n";
-      mDateTime = "±£´æÊ±¼ä\r\n";
-      mUserName = "ÓÃ»§Ãû\r\n";
-      mDescript = "°æ±¾ËµÃ÷\r\n";
-      try {
-        if (DbaObj.OpenConnection()) {
-          try {
-            ResultSet result = DbaObj.ExecuteQuery(Sql);
-            while (result.next()) {
-              try {
-                mFileID += String.valueOf(result.getInt("FileID")) + "\r\n"; //ÎÄ¼şºÅÁĞ±í
-                mDateTime += result.getString("FileDate") + "\r\n"; //ÈÕÆÚÁĞ±í
-                mUserName += result.getString("UserName") + "\r\n"; //ÓÃ»§ÃûÁĞ±í
-                mDescript += result.getString("Descript") + "\r\n"; //Èç¹ûËµÃ÷ĞÅÏ¢ÀïÓĞ»Ø³µ£¬Ôò½«»Ø³µ±ä³É>·ûºÅ
-              }
-              catch (Exception ex) {
-                System.out.println(ex.toString());
-              }
-            }
-            result.close();
-            mResult = true;
-          }
-          catch (SQLException e) {
-            System.out.println(e.getMessage());
-            mResult = false;
-          }
-        }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-
-    //µ÷ÈëÑ¡ÖĞ°æ±¾£¬Í¨¹ıÎÄ¼şºÅµ÷ÓÃmFileID,²¢°ÑÎÄ¼ş·ÅÈëmFileBodyÀï£¬ÒÔ±ã½øĞĞ´ò°ü
-    private boolean LoadVersion(String mFileID) {
-      boolean mResult = false;
-      String Sql = "SELECT FileBody,FileSize FROM Version_File WHERE RecordID='" + mRecordID + "' and  FileID=" + mFileID;
-      try {
-        if (DbaObj.OpenConnection()) {
-          try {
-            ResultSet result = DbaObj.ExecuteQuery(Sql);
-            if (result.next()) {
-              try {
-                mFileBody = result.getBytes("FileBody");
-                if (result.wasNull()) {
-                  mFileBody = null;
-                }
-                mResult = true;
-              }
-              catch (Exception ex) {
-                System.out.println(ex.toString());
-              }
-            }
-            result.close();
-          }
-          catch (SQLException e) {
-            System.out.println(e.getMessage());
-            mResult = false;
-          }
-        }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-
-    //±£´æ°æ±¾£¬½«¸Ã°æ±¾ÎÄ¼ş´æÅÌ£¬²¢½«ËµÃ÷ĞÅÏ¢Ò²±£´æÆğÀ´
-    private boolean SaveVersion() {
-      boolean mResult = false;
-      int iFileId = -1;
-      String Sql = "insert into Version_File (RecordID,FileName,FileType,FileSize,FileDate,FileBody,FilePath,UserName,Descript) values (?,?,?,?,?,?,?,?,? )";
-      try {
-        if (DbaObj.OpenConnection()) {
-          java.sql.PreparedStatement prestmt = null;
-          try {
-            prestmt = DbaObj.Conn.prepareStatement(Sql);
-            prestmt.setString(1, mRecordID);
-            prestmt.setString(2, mFileName);
-            prestmt.setString(3, mFileType);
-            prestmt.setInt(4, mFileSize);
-            prestmt.setString(5, mFileDate);
-            prestmt.setBytes(6, mFileBody);
-            prestmt.setString(7, mFilePath);
-            prestmt.setString(8, mUserName);
-            prestmt.setString(9, mDescript); //"Í¨ÓÃ°æ±¾"
-            prestmt.execute();
-            prestmt.close();
-            mResult = true;
-          }
-          catch (SQLException e) {
-            System.out.println(e.toString());
-            mResult = false;
-          }
-        }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-    //==============================¡ü°æ±¾¹ÜÀí´úÂë¡¾½áÊø¡¿¡ü==============================
-
-
-    //==============================¡ı±êÇ©¹ÜÀí´úÂë¡¾¿ªÊ¼¡¿¡ı==============================
-    //È¡µÃÊéÇ©ÁĞ±í
-    private boolean ListBookmarks() {
-      boolean mResult = false;
-      String Sql = "SELECT * FROM Bookmarks ";
-      mBookmark = "";
-      mDescript = "";
-      try {
-        if (DbaObj.OpenConnection()) {
-          try {
-            ResultSet result = DbaObj.ExecuteQuery(Sql);
-            while (result.next()) {
-              try {
-                mBookmark += result.getString("BookMarkName") + "\r\n"; //ÓÃ»§ÃûÁĞ±í
-                mDescript += result.getString("BookMarkDesc") + "\r\n"; //Èç¹ûËµÃ÷ĞÅÏ¢ÀïÓĞ»Ø³µ£¬Ôò½«»Ø³µ±ä³É>·ûºÅ
-              }
-              catch (Exception ex) {
-                System.out.println(ex.toString());
-              }
-            }
-            result.close();
-            mResult = true;
-          }
-          catch (SQLException e) {
-            System.out.println(e.getMessage());
-            mResult = false;
-          }
-        }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-
-    //×°ÈëÊéÇ©
-    private boolean LoadBookMarks() {
-      boolean mResult = false;
-      String Sql = " select b.BookMarkName,b.BookMarkText from Template_BookMarks a,BookMarks b where a.BookMarkname=b.BookMarkName and a.RecordID='" + mTemplate + "'";
-      try {
-        if (DbaObj.OpenConnection()) {
-          try {
-            ResultSet result = DbaObj.ExecuteQuery(Sql);
-            while (result.next()) {
-              try {
-                //ËµÃ÷£ºÎÒÃÇ²âÊÔ³ÌĞò°ÑSQLÓï¾äÖ±½ÓĞ´µ½Ìæ»»±êÇ©ÄÚÈİ
-                //Êµ¼ÊÊ¹ÓÃÖĞ£¬Õâ¸ö±êÇ©ÄÚÈİÊÇÍ¨¹ıSqlÓï¾äµÃµ½µÄ¡£
-                //Éú³ÉSQL²éÑ¯Óï¾ä  result.getString("BookMarkText") & "Ìõ¼ş"
-                //µ±Ç°¼ÍÂ¼ºÅÎ» mRecordID
-                //BookMarkValue=Éú³ÉSQLÔËĞĞ½á¹û
-                String mBookMarkName = result.getString("BookMarkName");
-                String mBookMarkValue = result.getString("BookMarkText");
-                MsgObj.SetMsgByName(mBookMarkName, mBookMarkValue);
-              }
-              catch (Exception ex) {
-                System.out.println(ex.toString());
-              }
-            }
-            result.close();
-            mResult = true;
-          }
-          catch (SQLException e) {
-            System.out.println(e.getMessage());
-            mResult = false;
-          }
-        }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-
-    //±£´æÊéÇ©
-    private boolean SaveBookMarks() {
-      boolean mResult = false;
-      String mBookMarkName;
-      int mIndex;
-      try {
-        if (DbaObj.OpenConnection()) {
-          try {
-            java.sql.PreparedStatement prestmt = null;
-            String Sql = "DELETE FROM Template_BookMarks Where RecordID='" + mTemplate + "'";
-            prestmt = DbaObj.Conn.prepareStatement(Sql);
-            
-            prestmt.execute();
-            
-            prestmt.close();
-            for (mIndex = 7; mIndex <= MsgObj.GetFieldCount() - 1; mIndex++) {
-              java.sql.PreparedStatement prestmtx = null;
-              mBookMarkName = MsgObj.GetFieldName(mIndex);
-              Sql = "insert into Template_BookMarks (RecordId,BookMarkName) values ('" + mTemplate + "','" + mBookMarkName + "')";
-              prestmtx = DbaObj.Conn.prepareStatement(Sql);
-              
-              prestmtx.execute();
-              
-              prestmtx.close();
-            }
-            mResult = true;
-          }
-          catch (SQLException e) {
-            System.out.println(e.toString());
-            mResult = false;
-          }
-        }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-    //==============================¡ü±êÇ©¹ÜÀí´úÂë¡¾½áÊø¡¿¡ü==============================
-
-
-    //==============================¡ıÇ©ÕÂ¹ÜÀí´úÂë¡¾¿ªÊ¼¡¿¡ı==============================
-    //È¡µÃÇ©ÃûÁĞ±í
-    private boolean LoadMarkList() {
-      String Sql = "SELECT MarkName FROM Signature";
-      mMarkList = "";
-      boolean mResult = false;
-      try {
-        if (DbaObj.OpenConnection()) {
-          try {
-            ResultSet result = DbaObj.ExecuteQuery(Sql);
-            while (result.next()) {
-              try {
-                mMarkList += result.getString("MarkName") + "\r\n";
-              }
-              catch (Exception ex) {
-                System.out.println(ex.toString());
-              }
-            }
-            result.close();
-            mResult = true;
-          }
-          catch (SQLException e) {
-            System.out.println(e.getMessage());
-            mResult = false;
-          }
-        }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-
-    //µ÷ÈëÇ©Ãû¼ÍÂ¼
-    private boolean LoadMarkImage(String vMarkName, String vPassWord) {
-      String Sql = "SELECT MarkBody,MarkType FROM Signature WHERE MarkName='" + vMarkName + "' and PassWord='" + vPassWord + "'";
-      boolean mResult = false;
-      try {
-        if (DbaObj.OpenConnection()) {
-          try {
-            ResultSet result = DbaObj.ExecuteQuery(Sql);
-            if (result.next()) {
-              try {
-                mFileBody = result.getBytes("MarkBody");
-                mFileType = result.getString("MarkType");
-                mResult = true;
-              }
-              catch (Exception ex) {
-                System.out.println(ex.toString());
-              }
-            }
-            result.close();
-          }
-          catch (SQLException e) {
-            System.out.println(e.getMessage());
-            mResult = false;
-          }
-        }
-      }
-      finally {
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-
-    //±£´æÇ©Ãû
-    private boolean SaveSignature() {
-      boolean mResult = false;
-      String Sql = "insert into Document_Signature (RecordID,MarkName,UserName,DateTime,HostName,MarkGuid) values (?,?,?,?,?,? ) ";
-      if (DbaObj.OpenConnection()) {
-        java.sql.PreparedStatement prestmt = null;
-        try {
-          prestmt = DbaObj.Conn.prepareStatement(Sql);
-          prestmt.setString(1, mRecordID);
-          prestmt.setString(2, mMarkName);
-          prestmt.setString(3, mUserName);
-          prestmt.setString(4, mDateTime);
-          prestmt.setString(5, mHostName);
-          prestmt.setString(6, mMarkGuid);
-          prestmt.execute();
-          prestmt.close();
-          mResult = true;
-        }
-        catch (SQLException e) {
-          System.out.println(e.toString() + Sql);
-          mResult = false;
-        }
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-
-    //ÁĞ³öËùÓĞÇ©Ãû
-    private boolean LoadSignature() {
-      boolean mResult = false;
-      SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-      String Sql = "SELECT MarkName,UserName,DateTime,HostName,MarkGuid FROM Document_Signature WHERE RecordID='" + mRecordID + "'";
-      mMarkName = "Ó¡ÕÂÃû³Æ\r\n";
-      mUserName = "Ç©ÃûÈË\r\n";
-      mDateTime = "Ç©ÕÂÊ±¼ä\r\n";
-      mHostName = "¿Í»§¶ËIP\r\n";
-      mMarkGuid = "ĞòÁĞºÅ\r\n";
-      if (DbaObj.OpenConnection()) {
-        try {
-          mResult = true;
-          ResultSet result = DbaObj.ExecuteQuery(Sql);
-          while (result.next()) {
-            mMarkName += result.getString("MarkName") + "\r\n"; //ÎÄ¼şºÅÁĞ±í
-            mUserName += result.getString("UserName") + "\r\n"; //ÈÕÆÚÁĞ±í
-            mDateTime += formatter.format(result.getTimestamp("DateTime")) + "\r\n";
-            mHostName += result.getString("HostName") + "\r\n";
-            mMarkGuid += result.getString("MarkGuid") + "\r\n";
-          }
-          result.close();
-        }
-        catch (Exception e) {
-          System.out.println(e.toString());
-          mResult = false;
-        }
-        DbaObj.CloseConnection();
-      }
-      return (mResult);
-    }
-    //==============================¡üÇ©ÕÂ¹ÜÀí´úÂë¡¾½áÊø¡¿¡ü==============================
-
-
-    //==============================¡ıÀ©Õ¹¹¦ÄÜ´úÂë¡¾¿ªÊ¼¡¿¡ı==============================
-    //µ÷³öËù¶ÔÓ¦µÄÎÄ±¾
-    private boolean LoadContent() {
-      boolean mResult = false;
-      //´ò¿ªÊı¾İ¿â
-      //¸ù¾İ mRecordID »ò mFileName µÈĞÅÏ¢
-      //ÌáÈ¡ÎÄ±¾ĞÅÏ¢¸¶¸ømContent¼´¿É¡£
-      //±¾ÑİÊ¾¼ÙÉèÈ¡µÃµÄÎÄ±¾ĞÅÏ¢ÈçÏÂ£º
-      mContent = "";
-      mContent += "±¾ÎÄµÄ¼ÍÂ¼ºÅ£º" + mRecordID + "\n";
-      mContent += "±¾ÎÄµÄÎÄ¼şÃû£º" + mFileName + "\n";
-      mContent += "    Õâ¸ö²¿·ÖÇë×Ô¼º¼ÓÈë£¬ºÍÄãÃÇµÄÊı¾İ¿â½áºÏÆğÀ´¾Í¿ÉÒÔÁË\n";
-      mResult = true;
-      return (mResult);
-    }
-
-    //±£´æËù¶ÔÓ¦µÄÎÄ±¾
-    private boolean SaveContent() {
-      boolean mResult = false;
-      //´ò¿ªÊı¾İ¿â
-      //¸ù¾İ mRecordID »ò mFileName µÈĞÅÏ¢
-      //²åÈëÎÄ±¾ĞÅÏ¢ mContentÀïµÄÎÄ±¾µ½Êı¾İ¿âÖĞ¼´¿É¡£
-      mResult = true;
-      return (mResult);
-    }
-
-    //Ôö¼ÓĞĞ²¢Ìî³ä±í¸ñÄÚÈİ
-    private boolean GetWordTable() {
-      int i, n;
-      String strI, strN;
-      boolean mResult;
-      mColumns = 3;
-      mCells = 8;
-      MsgObj.MsgTextClear();
-      MsgObj.SetMsgByName("COLUMNS", String.valueOf(mColumns)); //ÉèÖÃ±í¸ñĞĞ
-      MsgObj.SetMsgByName("CELLS", String.valueOf(mCells)); //ÉèÖÃ±í¸ñÁĞ
-      //¸Ã²¿·ÖÄÚÈİ¿ÉÒÔ´ÓÊı¾İ¿âÖĞ¶ÁÈ¡
-      try {
-        for (i = 1; i <= mColumns; i++) {
-          strI = String.valueOf(i);
-          for (n = 1; n <= mCells; n++) {
-            MsgObj.SetMsgByName(String.valueOf(i) + String.valueOf(n), "ÄÚÈİ" + DbaObj.GetDateTime());
-          }
-        }
-        mResult = true;
-      }
-      catch (Exception e) {
-        System.out.println(e.toString());
-        mResult = false;
-      }
-      return (mResult);
-    }
-
-    //¸üĞÂ´òÓ¡·İÊı
-    private boolean UpdataCopies(int mLeftCopies) {
-      boolean mResult = true;
-      //¸Ãº¯Êı¿ÉÒÔ°Ñ´òÓ¡¼õÉÙµÄ´ÎÊı¼ÇÂ¼µ½Êı¾İ¿â
-      //¸ù¾İ×Ô¼ºµÄÏµÍ³½øĞĞÀ©Õ¹¸Ã¹¦ÄÜ
-      return mResult;
-    }
-    //==============================¡üÀ©Õ¹¹¦ÄÜ´úÂë¡¾½áÊø¡¿¡ü==============================
-
-
-    //==============================¡ı½ÓÊÕÁ÷¡¢Ğ´»ØÁ÷´úÂë¡¾¿ªÊ¼¡¿¡ı==============================
-    //È¡µÃ¿Í»§¶Ë·¢À´µÄÊı¾İ°ü
-    private byte[] ReadPackage(HttpServletRequest request) {
-      byte mStream[] = null;
-      int totalRead = 0;
-      int readBytes = 0;
-      int totalBytes = 0;
-      try {
-        totalBytes = request.getContentLength();
-        mStream = new byte[totalBytes];
-        while (totalRead < totalBytes) {
-          request.getInputStream();
-          readBytes = request.getInputStream().read(mStream, totalRead, totalBytes - totalRead);
-          totalRead += readBytes;
-          continue;
-        }
-      }
-      catch (Exception e) {
-        System.out.println(e.toString());
-      }
-      return (mStream);
-    }
-
-    //·¢ËÍ´¦ÀíºóµÄÊı¾İ°ü
-    private void SendPackage(HttpServletResponse response) {
-      try {
-        ServletOutputStream OutBinarry = response.getOutputStream();
-        OutBinarry.write(MsgObj.MsgVariant());
-        OutBinarry.flush();
-        OutBinarry.close();
-      }
-      catch (IOException e) {
-        System.out.println(e.toString());
-      }
-    }
-    //==============================¡ü½ÓÊÕÁ÷¡¢Ğ´»ØÁ÷´úÂë¡¾½áÊø¡¿¡ü==============================
-
-
-    public void ExecuteRun(HttpServletRequest request, HttpServletResponse response) {
-      DbaObj = new DBstep.iDBManager2000(); //´´½¨Êı¾İ¿â¶ÔÏó
-      MsgObj = new DBstep.iMsgServer2000(); //´´½¨ĞÅÏ¢°ü¶ÔÏó
-      mOption = "";
-      mRecordID = "";
-      mTemplate = "";
-      mFileBody = null;
-      mFileName = "";
-      mFileType = "";
-      mFileSize = 0;
-      mFileID = "";
-      mDateTime = "";
-      mMarkName = "";
-      mPassword = "";
-      mMarkList = "";
-      mBookmark = "";
-      mMarkGuid = "";
-      mDescript = "";
-      mCommand = "";
-      mContent = "";
-      mLabelName = "";
-      mImageName = "";
-      mTableContent = "";
-      mMyDefine1 = "";
-      mOfficePrints = "0";
-      mFilePath = request.getSession().getServletContext().getRealPath("");       //È¡µÃ·şÎñÆ÷Â·¾¶
-      System.out.println("ReadPackage");
-
-      try {
-		System.out.println("==request.getMethod()==" + request.getMethod());
-        if (request.getMethod().equalsIgnoreCase("POST")) {
-          //MsgObj.MsgVariant(ReadPackage(request));                              //ÀÏ°æ±¾ºóÌ¨Àà£¬²»Ö§³ÖUTF-8±àÂë×ÔÊÊÓ¦¹¦ÄÜ
-          MsgObj.Load(request);                                                   //8.1.0.2°æºóÌ¨ÀàĞÂÔö½âÎö½Ó¿Ú£¬¿ÉÖ§³ÖUTF-8±àÂë×ÔÊÊÓ¦¹¦ÄÜ
-		System.out.println("==DBSTEP==" + MsgObj.GetMsgByName("DBSTEP"));
-		                      //È¡µÃÎÄµµÃû³Æ
-	    System.out.println("FILENAME:"+ MsgObj.GetMsgByName("FILENAME"));    
-          if (MsgObj.GetMsgByName("DBSTEP").equalsIgnoreCase("DBSTEP")) {         //ÅĞ¶ÏÊÇ·ñÊÇºÏ·¨µÄĞÅÏ¢°ü£¬»òÕßÊı¾İ°üĞÅÏ¢ÊÇ·ñÍêÕû
-            mOption = MsgObj.GetMsgByName("OPTION");                              //È¡µÃ²Ù×÷ĞÅÏ¢
-            mUserName = MsgObj.GetMsgByName("USERNAME");                          //È¡µÃÏµÍ³ÓÃ»§
-        System.out.println("OPTION:"+mOption);                                //´òÓ¡³öµ÷ÊÔĞÅÏ¢
-            if (mOption.equalsIgnoreCase("LOADFILE")) {                           //ÏÂÃæµÄ´úÂëÎª´ò¿ª·şÎñÆ÷Êı¾İ¿âÀïµÄÎÄ¼ş
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mFileName = MsgObj.GetMsgByName("FILENAME");                        //È¡µÃÎÄµµÃû³Æ
-	    System.out.println("FILENAME:"+mFileName);    
-              mFileType = MsgObj.GetMsgByName("FILETYPE");                        //È¡µÃÎÄµµÀàĞÍ
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              //if (MsgObj.MsgFileLoad(mFilePath+"\\"+mFileName))			            //´ÓÎÄ¼ş¼Ğµ÷ÈëÎÄµµ
-			  System.out.println("Begin  if (LoadFile()) ");      
-              if (LoadFile()) {                                                   //´ÓÊı¾İ¿âµ÷ÈëÎÄµµ
-                MsgObj.MsgFileBody(mFileBody);                                    //½«ÎÄ¼şĞÅÏ¢´ò°ü
-                MsgObj.SetMsgByName("STATUS", "´ò¿ª³É¹¦!");                       //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-				  System.out.println("LoadFile() success ["+mFileBody+"]");  
-              }
-              else {
-				  System.out.println("LoadFile() ´ò¿ªÊ§°Ü ");  
-                MsgObj.MsgError("loadFile Fail!");                                     //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("SAVEFILE")) {                      //ÏÂÃæµÄ´úÂëÎª±£´æÎÄ¼şÔÚ·şÎñÆ÷µÄÊı¾İ¿âÀï
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mFileName = MsgObj.GetMsgByName("FILENAME");                        //È¡µÃÎÄµµÃû³Æ
-              mFileType = MsgObj.GetMsgByName("FILETYPE");                        //È¡µÃÎÄµµÀàĞÍ
-              mUserName = mUserName;                                              //È¡µÃ±£´æÓÃ»§Ãû³Æ
-              mDescript = "Í¨ÓÃ°æ±¾";                                             //°æ±¾ËµÃ÷
-              mFileSize = MsgObj.MsgFileSize();                                   //È¡µÃÎÄµµ´óĞ¡
-              mFileDate = DbaObj.GetDateTime();                                   //È¡µÃÎÄµµÊ±¼ä
-              mFileBody = MsgObj.MsgFileBody();                                   //È¡µÃÎÄµµÄÚÈİ
-			  String moduleType = MsgObj.GetMsgByName("moduleType");
-			  String isDoc = MsgObj.GetMsgByName("isDoc");
-			  System.out.println("´«ÈëisDoc£º"+isDoc+ "---moduleType"+moduleType+"---Öµ"+isDoc.equals("")+",,,,"+(isDoc==null));
-             
-			  System.out.println("mRecordID=================="+mRecordID);  
-			  System.out.println("mFileName=================="+mFileName); 
-			  System.out.println("mFileType=================="+mFileType); 
-
-              String isEmpty = MsgObj.GetMsgByName("EMPTY");                      //ÊÇ·ñÊÇ¿ÕÄÚÈİÎÄµµµÄ±êÊ¶
-              if(isEmpty.equalsIgnoreCase("TRUE")){
-                //´ËÊ±½ÓÊÕµÄÎÄµµÖĞÄÚÈİÊÇ¿Õ°×µÄ£¬ÇëÓÃÈÕÖ¾¼ÇÂ¼±£´æÊ±¼ä¡¢±£´æÓÃ»§¡¢¼ÇÂ¼±àºÅµÈĞÅÏ¢£¬ÓÃÓÚ½«À´·¢ÏÖÎÄµµÄÚÈİ¶ªÊ§Ê±ÅÅ²éÓÃ¡£
-                System.out.println("×¢Òâ£º±¾´Î±£´æµÄÊÇ¿Õ°×ÄÚÈİµÄÎÄµµ¡£RECORDID£º"+mRecordID);
-              }
-              System.out.println("1111111111111111=================="); 
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              //if (MsgObj.MsgFileSave(mFilePath+"\\"+mFileName))			            //±£´æÎÄµµÄÚÈİµ½ÎÄ¼ş¼ĞÖĞ
-			  System.out.println("222222222222222222=================="); 
-			  if(isDoc.equals("false") || isDoc.equals("") || isDoc ==null){
-				    if (SaveFile()) {                                                   //±£´æÎÄµµÄÚÈİµ½Êı¾İ¿âÖĞ
-						MsgObj.SetMsgByName("STATUS", "±£´æ³É¹¦!");                       //ÉèÖÃ×´Ì¬ĞÅÏ¢
-						MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-					}
-				  else {
-					MsgObj.MsgError("±£´æÊ§°Ü!");                                     //ÉèÖÃ´íÎóĞÅÏ¢
-				  }
-			  }else if(isDoc.equals("true")){
-				   System.out.println("save file start -----------");
-						 String myPath = this.mFilePath + 
-						"//iWebOfficeSign//Document";
-					  if (moduleType.equals("information")) {
-						myPath = this.mFilePath + "//upload//information";
-					  } else if (moduleType.equals("govdocument")) {
-						myPath = this.mFilePath + 
-						  "//upload//govdocumentmanager";
-					  }
-					  else if (moduleType.indexOf("dossier") > -1) {
-						myPath = this.mFilePath + "//upload//dossier" + 
-						  "//sendType" + 
-						  moduleType.substring(moduleType
-						  .indexOf("dossier") + 7);
-						try {
-						  File myFilePath = new File(
-							myPath);
-						  if (!myFilePath.exists())
-						  myFilePath.mkdir();
-						}
-						catch (Exception e) {
-						  System.out.println("ĞÂ½¨Ä¿Â¼²Ù×÷³ö´í");
-						  e.printStackTrace();
-						}
-					  } else {
-						myPath = this.mFilePath + 
-						  "//upload//" + moduleType;
-					  }
-						 System.out.println("myPath #####:"+myPath);
-						 try{
-							this.MsgObj.MsgFileSave(myPath + "//" + this.mRecordID + 
-						  this.mFileType);
-						System.out.println(" after  MsgFileSave ");
-					  SysSetupReader sss = new SysSetupReader();
-                     System.out.println(" wwwwww====== ");
-					  Map sysMap = 
-						SysSetupReader.getInstance()
-						.getSysSetupMap("0");
-					    System.out.println(" wwwwww2222222====== ");
-						System.out.println(" sysMap "+sysMap);
-					  if ((sysMap != null) && (sysMap.get("¸½¼şÉÏ´«") != null) && 
-						(sysMap.get("¸½¼şÉÏ´«").toString().equals("0")) && 
-						(moduleType.indexOf("dossier") < 0)) {
-					
-					  } else {
-						System.out.println("sysMap @@@@:"+sysMap);
-						SysSetupReader sysRed = SysSetupReader.getInstance();
-						Map sysMap2 = sysRed.getSysSetupMap("0");
-
-						String isEncrypt = (String)sysMap2.get("¼ÓÃÜ´æ´¢");
-						if (isEncrypt == null) isEncrypt = "0";
-						System.out.println("isEncrypt: "+isEncrypt);
-						UploadFile upFile = 
-						  new UploadFile();
-						System.out.println("±£´æÎïÀíÎÄ¼ş·½·¨-----------mRecordID"+this.mRecordID+"----mFileType"+this.mFileType);
-						upFile.setFileSize(this.mRecordID + this.mFileType, 
-						  this.mFileSize, moduleType.equals("govdocument") ? "govdocumentmanager" : moduleType, 
-						  request, isEncrypt.equals("1"));
-					  }
-						 }catch(Exception e){
-							 System.out.println("error");
-							  e.printStackTrace();
-						 }
-						
-						 System.out.println("±£´æÎïÀíÎÄ¼ş½áÊø-----------");
-			  }
-			  System.out.println("44444444444444444=================="); 
-              MsgObj.MsgFileClear();                                              //Çå³ıÎÄµµÄÚÈİ
-            }
-
-            else if (mOption.equalsIgnoreCase("LOADTEMPLATE")) {                  //ÏÂÃæµÄ´úÂëÎª´ò¿ª·şÎñÆ÷Êı¾İ¿âÀïµÄÄ£°åÎÄ¼ş
-              mTemplate = MsgObj.GetMsgByName("TEMPLATE");                        //È¡µÃÄ£°åÎÄµµÀàĞÍ
-              //±¾¶Î´¦ÀíÊÇ·ñµ÷ÓÃÎÄµµÊ±´ò¿ªÄ£°æ£¬»¹ÊÇÌ×ÓÃÄ£°æÊ±´ò¿ªÄ£°æ¡£
-              mCommand = MsgObj.GetMsgByName("COMMAND");                          //È¡µÃ¿Í»§¶Ë¶¨ÒåµÄ±äÁ¿COMMANDÖµ
-              if (mCommand.equalsIgnoreCase("INSERTFILE")) {
-                if (MsgObj.MsgFileLoad(mFilePath + "\\Document\\" + mTemplate)) { //´Ó·şÎñÆ÷ÎÄ¼ş¼ĞÖĞµ÷ÈëÄ£°åÎÄµµ
-                  MsgObj.SetMsgByName("STATUS", "´ò¿ªÄ£°å³É¹¦!");                 //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                  MsgObj.MsgError("");                                            //Çå³ı´íÎóĞÅÏ¢
-                }
-                else {
-                  MsgObj.MsgError("´ò¿ªÄ£°åÊ§°Ü!");                               //ÉèÖÃ´íÎóĞÅÏ¢
-                }
-              }
-              else {
-                MsgObj.MsgTextClear();                                            //Çå³ıÎÄ±¾ĞÅÏ¢
-                if (LoadTemplate()) {                                             //µ÷ÈëÄ£°åÎÄµµ
-                  MsgObj.MsgFileBody(mFileBody);                                  //½«ÎÄ¼şĞÅÏ¢´ò°ü
-                  MsgObj.SetMsgByName("STATUS", "´ò¿ªÄ£°å³É¹¦!");                 //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                  MsgObj.MsgError("");                                            //Çå³ı´íÎóĞÅÏ¢
-                }
-                else {
-                  MsgObj.MsgError("´ò¿ªÄ£°åÊ§°Ü!");                               //ÉèÖÃ´íÎóĞÅÏ¢
-                }
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("SAVETEMPLATE")) {                  //ÏÂÃæµÄ´úÂëÎª±£´æÄ£°åÎÄ¼şÔÚ·şÎñÆ÷µÄÊı¾İ¿âÀï
-              mTemplate = MsgObj.GetMsgByName("TEMPLATE");                        //È¡µÃÎÄµµ±àºÅ
-              mFileName = MsgObj.GetMsgByName("FILENAME");                        //È¡µÃÎÄµµÃû³Æ
-              mFileType = MsgObj.GetMsgByName("FILETYPE");                        //È¡µÃÎÄµµÀàĞÍ
-              mUserName = mUserName;                                              //È¡µÃ±£´æÓÃ»§Ãû³Æ
-              mDescript = "Í¨ÓÃÄ£°å";                                             //°æ±¾ËµÃ÷
-              mFileSize = MsgObj.MsgFileSize();                                   //È¡µÃÎÄµµ´óĞ¡
-              mFileDate = DbaObj.GetDateTime();                                   //È¡µÃÎÄµµÊ±¼ä
-              mFileBody = MsgObj.MsgFileBody();                                   //È¡µÃÎÄµµÄÚÈİ
-              MsgObj.MsgTextClear();
-              if (SaveTemplate()) {                                               //±£´æÄ£°åÎÄµµÄÚÈİ
-                MsgObj.SetMsgByName("STATUS", "±£´æÄ£°å³É¹¦!");                   //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("±£´æÄ£°åÊ§°Ü!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-              MsgObj.MsgFileClear();
-            }
-
-            else if (mOption.equalsIgnoreCase("LISTVERSION")) {                   //ÏÂÃæµÄ´úÂëÎª´ò¿ª°æ±¾ÁĞ±í
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              MsgObj.MsgTextClear();
-              if (ListVersion()) {                                                //Éú³É°æ±¾ÁĞ±í
-                MsgObj.SetMsgByName("FILEID", mFileID);                           //½«ÎÄµµºÅÁĞ±í´ò°ü
-                MsgObj.SetMsgByName("DATETIME", mDateTime);                       //½«ÈÕÆÚÊ±¼äÁĞ±í´ò°ü
-                MsgObj.SetMsgByName("USERNAME", mUserName);                       //½«ÓÃ»§ÃûÁĞ±í´ò°ü
-                MsgObj.SetMsgByName("DESCRIPT", mDescript);                       //½«ËµÃ÷ĞÅÏ¢ÁĞ±í´ò°ü
-                MsgObj.SetMsgByName("STATUS", "°æ±¾ÁĞ±í³É¹¦!");                   //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("°æ±¾ÁĞ±íÊ§°Ü!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("LOADVERSION")) {                   //ÏÂÃæµÄ´úÂëÎª´ò¿ª°æ±¾ÎÄµµ
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mFileID = MsgObj.GetMsgByName("FILEID");                            //È¡µÃ°æ±¾ÎÄµµºÅ
-              MsgObj.MsgTextClear();
-              if (LoadVersion(mFileID)) {                                         //µ÷Èë¸Ã°æ±¾ÎÄµµ
-                MsgObj.MsgFileBody(mFileBody);                                    //½«ÎÄµµĞÅÏ¢´ò°ü
-                MsgObj.SetMsgByName("STATUS", "´ò¿ª°æ±¾³É¹¦!");                   //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("´ò¿ª°æ±¾Ê§°Ü!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("SAVEVERSION")) {                   //ÏÂÃæµÄ´úÂëÎª±£´æ°æ±¾ÎÄµµ
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mFileID = MsgObj.GetMsgByName("FILEID");                            //È¡µÃ°æ±¾ÎÄµµºÅ   Èç:WebSaveVersionByFileID£¬ÔòFileIDÖµ´æÔÚ
-              mFileName = MsgObj.GetMsgByName("FILENAME");                        //È¡µÃÎÄµµÃû³Æ
-              mFileType = MsgObj.GetMsgByName("FILETYPE");                        //È¡µÃÎÄµµÀàĞÍ
-              mUserName = mUserName;                                              //È¡µÃ±£´æÓÃ»§Ãû³Æ
-              mDescript = MsgObj.GetMsgByName("DESCRIPT");                        //È¡µÃËµÃ÷ĞÅÏ¢
-              mFileSize = MsgObj.MsgFileSize();                                   //È¡µÃÎÄµµ´óĞ¡
-              mFileDate = DbaObj.GetDateTime();                                   //È¡µÃÎÄµµÊ±¼ä
-              mFileBody = MsgObj.MsgFileBody();                                   //È¡µÃÎÄµµÄÚÈİ
-              MsgObj.MsgTextClear();
-              if (SaveVersion()) {                                                //±£´æ°æ±¾ÎÄµµ
-                MsgObj.SetMsgByName("STATUS", "±£´æ°æ±¾³É¹¦!");                   //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("±£´æ°æ±¾Ê§°Ü!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-              MsgObj.MsgFileClear();                                              //Çå³ıÎÄµµÄÚÈİ
-            }
-
-            else if (mOption.equalsIgnoreCase("LOADBOOKMARKS")) {                 //ÏÂÃæµÄ´úÂëÎªÈ¡µÃÎÄµµ±êÇ©
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mTemplate = MsgObj.GetMsgByName("TEMPLATE");                        //È¡µÃÄ£°å±àºÅ
-              mFileName = MsgObj.GetMsgByName("FILENAME");                        //È¡µÃÎÄµµÃû³Æ
-              mFileType = MsgObj.GetMsgByName("FILETYPE");                        //È¡µÃÎÄµµÀàĞÍ
-              MsgObj.MsgTextClear();
-              if (LoadBookMarks()) {
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("×°Èë±êÇ©ĞÅÏ¢Ê§°Ü!");                             //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("SAVEBOOKMARKS")) {                 //ÏÂÃæµÄ´úÂëÎªÈ¡µÃ±êÇ©ÎÄµµÄÚÈİ
-              mTemplate = MsgObj.GetMsgByName("TEMPLATE");                        //È¡µÃÄ£°å±àºÅ
-              if (SaveBookMarks()) {
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("±£´æ±êÇ©ĞÅÏ¢Ê§°Ü!");                             //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-            }
-
-            else if (mOption.equalsIgnoreCase("LISTBOOKMARKS")) {                 //ÏÂÃæµÄ´úÂëÎªÏÔÊ¾±êÇ©ÁĞ±í
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              if (ListBookmarks()) {
-                MsgObj.SetMsgByName("BOOKMARK", mBookmark);                       //½«ÓÃ»§ÃûÁĞ±í´ò°ü
-                MsgObj.SetMsgByName("DESCRIPT", mDescript);                       //½«ËµÃ÷ĞÅÏ¢ÁĞ±í´ò°ü
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("µ÷Èë±êÇ©Ê§°Ü!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("LOADMARKLIST")) {                  //ÏÂÃæµÄ´úÂëÎª´´½¨Ó¡ÕÂÁĞ±í
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              if (LoadMarkList()) {
-                MsgObj.SetMsgByName("MARKLIST", mMarkList);                       //ÏÔÊ¾Ç©ÕÂÁĞ±í
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("´´½¨Ó¡ÕÂÁĞ±íÊ§°Ü!");                             //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("LOADMARKIMAGE")) {                 //ÏÂÃæµÄ´úÂëÎª´ò¿ªÓ¡ÕÂÎÄ¼ş
-              mMarkName = MsgObj.GetMsgByName("IMAGENAME");                       //È¡µÃÇ©ÃûÃû³Æ
-              mUserName = MsgObj.GetMsgByName("USERNAME");                        //È¡µÃÓÃ»§Ãû³Æ
-              mPassword = MsgObj.GetMsgByName("PASSWORD");                        //È¡µÃÓÃ»§ÃÜÂë
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              if (LoadMarkImage(mMarkName, mPassword)) {                          //µ÷ÈëÇ©ÃûĞÅÏ¢
-                MsgObj.SetMsgByName("IMAGETYPE", mFileType);                      //ÉèÖÃÇ©ÃûÀàĞÍ
-                MsgObj.MsgFileBody(mFileBody);                                    //½«Ç©ÃûĞÅÏ¢´ò°ü
-                MsgObj.SetMsgByName("POSITION", "Manager");                       //²åÈëÎ»ÖÃ  ÔÚÎÄµµÖĞ±êÇ©"Manager"
-                MsgObj.SetMsgByName("ZORDER", "5");                               //4:ÔÚÎÄ×ÖÉÏ·½ 5:ÔÚÎÄ×ÖÏÂ·½
-                MsgObj.SetMsgByName("STATUS", "´ò¿ª³É¹¦!");                       //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("Ç©Ãû»òÃÜÂë´íÎó!");                               //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("SAVESIGNATURE")) {                 //ÏÂÃæµÄ´úÂëÎª±£´æÇ©ÕÂ»ù±¾ĞÅÏ¢
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mFileName = MsgObj.GetMsgByName("FILENAME");                        //È¡µÃÎÄ¼şÃû³Æ
-              mMarkName = MsgObj.GetMsgByName("MARKNAME");                        //È¡µÃÇ©ÃûÃû³Æ
-              mUserName = MsgObj.GetMsgByName("USERNAME");                        //È¡µÃÓÃ»§Ãû³Æ
-              mDateTime = MsgObj.GetMsgByName("DATETIME");                        //È¡µÃÇ©ÃûÊ±¼ä
-              mHostName = request.getRemoteAddr();                                //È¡µÃÓÃ»§IP
-              mMarkGuid = MsgObj.GetMsgByName("MARKGUID");                        //È¡µÃÎ¨Ò»±àºÅ
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              if (SaveSignature()) {                                              //±£´æÇ©ÕÂ
-                MsgObj.SetMsgByName("STATUS", "±£´æÓ¡ÕÂ³É¹¦!");                   //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("±£´æÓ¡ÕÂÊ§°Ü!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("LOADSIGNATURE")) {                 //ÏÂÃæµÄ´úÂëÎªµ÷³öÇ©ÕÂ»ù±¾ĞÅÏ¢
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              if (LoadSignature()) {                                              //µ÷³öÇ©ÕÂ
-                MsgObj.SetMsgByName("MARKNAME", mMarkName);                       //½«Ç©ÃûÃû³ÆÁĞ±í´ò°ü
-                MsgObj.SetMsgByName("USERNAME", mUserName);                       //½«ÓÃ»§ÃûÁĞ±í´ò°ü
-                MsgObj.SetMsgByName("DATETIME", mDateTime);                       //½«Ê±¼äÁĞ±í´ò°ü
-                MsgObj.SetMsgByName("HOSTNAME", mHostName);                       //½«¸ÇÕÂIPµØÖ·ÁĞ±í´ò°ü
-                MsgObj.SetMsgByName("MARKGUID", mMarkGuid);                       //½«Î¨Ò»±àºÅÁĞ±í´ò°ü
-                MsgObj.SetMsgByName("STATUS", "µ÷ÈëÓ¡ÕÂ³É¹¦!");                   //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("µ÷ÈëÓ¡ÕÂÊ§°Ü!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if(mOption.equalsIgnoreCase("SAVEPDF")){	                        //ÏÂÃæµÄ´úÂëÎª±£´æPDFÎÄ¼ş
-              mRecordID=MsgObj.GetMsgByName("RECORDID");	                        //È¡µÃÎÄµµ±àºÅ
-              mFileName=MsgObj.GetMsgByName("FILENAME");	                        //È¡µÃÎÄµµÃû³Æ
-              MsgObj.MsgTextClear();					                                    //Çå³ıÎÄ±¾ĞÅÏ¢
-              if (MsgObj.MsgFileSave(mFilePath+"\\Document\\"+mRecordID+".pdf")){ //±£´æÎÄµµµ½ÎÄ¼ş¼ĞÖĞ
-                MsgObj.SetMsgByName("STATUS", "±£´æ³É¹¦!");                       //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");					                                    //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("±£´æÊ§°Ü!");			                                //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-              MsgObj.MsgFileClear();					                                    //Çå³ıÎÄµµÄÚÈİ
-            }
-
-            else if (mOption.equalsIgnoreCase("SAVEASHTML")) {                    //ÏÂÃæµÄ´úÂëÎª½«OFFICE´æÎªHTMLÒ³Ãæ
-              mHtmlName = MsgObj.GetMsgByName("HTMLNAME");                        //È¡µÃÎÄ¼şÃû³Æ
-              mDirectory = MsgObj.GetMsgByName("DIRECTORY");                      //È¡µÃÄ¿Â¼Ãû³Æ
-              MsgObj.MsgTextClear();
-              if (mDirectory.trim().equalsIgnoreCase("")) {
-                mFilePath = mFilePath + "\\HTML";
-              }
-              else {
-                mFilePath = mFilePath + "\\HTML\\" + mDirectory;
-              }
-              MsgObj.MakeDirectory(mFilePath);                                    //´´½¨Â·¾¶
-              if (MsgObj.MsgFileSave(mFilePath + "\\" + mHtmlName)) {             //±£´æHTMLÎÄ¼ş
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-                MsgObj.SetMsgByName("STATUS", "±£´æHTML³É¹¦!");                   //ÉèÖÃ×´Ì¬ĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("±£´æHTMLÊ§°Ü!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-              MsgObj.MsgFileClear();
-            }
-
-            else if (mOption.equalsIgnoreCase("SAVEIMAGE")) {                     //ÏÂÃæµÄ´úÂëÎª½«OFFICE´æÎªHTMLÍ¼Æ¬Ò³Ãæ
-              mHtmlName = MsgObj.GetMsgByName("HTMLNAME");                        //È¡µÃÎÄ¼şÃû³Æ
-              mDirectory = MsgObj.GetMsgByName("DIRECTORY");                      //È¡µÃÄ¿Â¼Ãû³Æ
-              MsgObj.MsgTextClear();
-              if (mDirectory.trim().equalsIgnoreCase("")) {
-                mFilePath = mFilePath + "\\HTMLIMAGE";
-              }
-              else {
-                mFilePath = mFilePath + "\\HTMLIMAGE\\" + mDirectory;
-              }
-              MsgObj.MakeDirectory(mFilePath);                                    //´´½¨Â·¾¶
-              if (MsgObj.MsgFileSave(mFilePath + "\\" + mHtmlName)) {             //±£´æHTMLÎÄ¼ş
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-                MsgObj.SetMsgByName("STATUS", "±£´æHTMLÍ¼Æ¬³É¹¦!");               //ÉèÖÃ×´Ì¬ĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("±£´æHTMLÍ¼Æ¬Ê§°Ü!");                             //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-              MsgObj.MsgFileClear();
-            }
-
-            else if (mOption.equalsIgnoreCase("SAVEASPAGE")) {                    //ÏÂÃæµÄ´úÂëÎª½«ÊÖĞ´Åú×¢´æÎªHTMLÍ¼Æ¬Ò³Ãæ
-              mHtmlName = MsgObj.GetMsgByName("HTMLNAME");                        //È¡µÃÎÄ¼şÃû³Æ
-              mDirectory = MsgObj.GetMsgByName("DIRECTORY");                      //È¡µÃÄ¿Â¼Ãû³Æ
-              MsgObj.MsgTextClear();
-              if (mDirectory.trim().equalsIgnoreCase("")) {
-                mFilePath = mFilePath + "\\HTML";
-              }
-              else {
-                mFilePath = mFilePath + "\\HTML\\" + mDirectory;
-              }
-              MsgObj.MakeDirectory(mFilePath);                                    //´´½¨Â·¾¶
-              if (MsgObj.MsgFileSave(mFilePath + "\\" + mHtmlName)) {             //±£´æHTMLÎÄ¼ş
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-                MsgObj.SetMsgByName("STATUS", "±£´æÅú×¢HTMLÍ¼Æ¬³É¹¦!");           //ÉèÖÃ×´Ì¬ĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("±£´æÅú×¢HTMLÍ¼Æ¬Ê§°Ü!");                         //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-              MsgObj.MsgFileClear();
-            }
-
-            else if (mOption.equalsIgnoreCase("INSERTFILE")) {                    //ÏÂÃæµÄ´úÂëÎª²åÈëÎÄ¼ş
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mFileName = MsgObj.GetMsgByName("FILENAME");                        //È¡µÃÎÄµµÃû³Æ
-              mFileType = MsgObj.GetMsgByName("FILETYPE");                        //È¡µÃÎÄµµÀàĞÍ
-              MsgObj.MsgTextClear();
-              if (LoadFile()) {                                                   //µ÷ÈëÎÄµµ
-                MsgObj.MsgFileBody(mFileBody);                                    //½«ÎÄ¼şĞÅÏ¢´ò°ü
-                MsgObj.SetMsgByName("POSITION", "Content");                       //ÉèÖÃ²åÈëµÄÎ»ÖÃ[ÊéÇ©]
-                MsgObj.SetMsgByName("STATUS", "²åÈëÎÄ¼ş³É¹¦!");                   //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("²åÈëÎÄ¼ş³É¹¦!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("UPDATEFILE")) {                    //ÏÂÃæµÄ´úÂëÎª¸üĞÂ±£´æÎÄ¼ş
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mFileName = MsgObj.GetMsgByName("FILENAME");                        //È¡µÃÎÄµµÃû³Æ
-              mFileType = MsgObj.GetMsgByName("FILETYPE");                        //È¡µÃÎÄµµÀàĞÍ
-              mUserName = mUserName;                                              //È¡µÃ±£´æÓÃ»§Ãû³Æ
-              mDescript = "¶¨¸å°æ±¾";                                             //°æ±¾ËµÃ÷
-              mFileSize = MsgObj.MsgFileSize();                                   //È¡µÃÎÄµµ´óĞ¡
-              mFileDate = DbaObj.GetDateTime();                                   //È¡µÃÎÄµµÊ±¼ä
-              mFileBody = MsgObj.MsgFileBody();                                   //È¡µÃÎÄµµÄÚÈİ
-              MsgObj.MsgTextClear();
-              if (SaveVersion()) {                                                //±£´æÎÄµµÄÚÈİ
-                MsgObj.SetMsgByName("STATUS", "±£´æ¶¨¸å°æ±¾³É¹¦!");               //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("±£´æ¶¨¸å°æ±¾Ê§°Ü!");                             //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-              MsgObj.MsgFileClear();
-            }
-
-            else if (mOption.equalsIgnoreCase("INSERTIMAGE")) {                   //ÏÂÃæµÄ´úÂëÎª²åÈë·şÎñÆ÷Í¼Æ¬
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mLabelName = MsgObj.GetMsgByName("LABELNAME");                      //±êÇ©Ãû
-              mImageName = MsgObj.GetMsgByName("IMAGENAME");                      //Í¼Æ¬Ãû
-              mFilePath = mFilePath + "\\Document\\" + mImageName;                //Í¼Æ¬ÔÚ·şÎñÆ÷µÄÍêÕûÂ·¾¶
-              mFileType = mImageName.substring(mImageName.length() - 4).toLowerCase(); //È¡µÃÎÄ¼şµÄÀàĞÍ
-              MsgObj.MsgTextClear();
-              if (MsgObj.MsgFileLoad(mFilePath)) {                                //µ÷ÈëÍ¼Æ¬
-                MsgObj.SetMsgByName("IMAGETYPE", mFileType);                      //Ö¸¶¨Í¼Æ¬µÄÀàĞÍ
-                MsgObj.SetMsgByName("POSITION", mLabelName);                      //ÉèÖÃ²åÈëµÄÎ»ÖÃ[ÊéÇ©¶ÔÏóÃû]
-                MsgObj.SetMsgByName("STATUS", "²åÈëÍ¼Æ¬³É¹¦!");                   //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("²åÈëÍ¼Æ¬Ê§°Ü!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("PUTFILE")) {                       //ÏÂÃæµÄ´úÂëÎªÇëÇóÉÏ´«ÎÄ¼ş²Ù×÷
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mFileBody = MsgObj.MsgFileBody();                                   //È¡µÃÎÄµµÄÚÈİ
-              mLocalFile = MsgObj.GetMsgByName("LOCALFILE");                      //È¡µÃ±¾µØÎÄ¼şÃû³Æ
-              mRemoteFile = MsgObj.GetMsgByName("REMOTEFILE");                    //È¡µÃÔ¶³ÌÎÄ¼şÃû³Æ
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              mFilePath = mFilePath + "\\Document\\" + mRemoteFile;
-              if (MsgObj.MsgFileSave(mFilePath)) {                                //µ÷ÈëÎÄµµ
-                MsgObj.SetMsgByName("STATUS", "±£´æÉÏ´«ÎÄ¼ş³É¹¦!");               //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("ÉÏ´«ÎÄ¼şÊ§°Ü!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("GETFILE")) {                       //ÏÂÃæµÄ´úÂëÎªÇëÇóÏÂÔØÎÄ¼ş²Ù×÷
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mLocalFile = MsgObj.GetMsgByName("LOCALFILE");                      //È¡µÃ±¾µØÎÄ¼şÃû³Æ
-              mRemoteFile = MsgObj.GetMsgByName("REMOTEFILE");                    //È¡µÃÔ¶³ÌÎÄ¼şÃû³Æ
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              mFilePath = mFilePath + "\\Document\\" + mRemoteFile;
-              if (MsgObj.MsgFileLoad(mFilePath)) {                                //µ÷ÈëÎÄµµÄÚÈİ
-                MsgObj.SetMsgByName("STATUS", "±£´æÏÂÔØÎÄ¼ş³É¹¦!");               //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("ÏÂÔØÎÄ¼şÊ§°Ü!");                                 //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("DATETIME")) {                      //ÏÂÃæµÄ´úÂëÎªÇëÇóÈ¡µÃ·şÎñÆ÷Ê±¼ä
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              MsgObj.SetMsgByName("DATETIME", DbaObj.GetDateTime());              //±ê×¼ÈÕÆÚ¸ñÊ½×Ö´®£¬Èç 2005-8-16 10:20:35
-            }
-
-            else if (mOption.equalsIgnoreCase("SENDMESSAGE")) {                   //ÏÂÃæµÄ´úÂëÎªWebÒ³ÃæÇëÇóĞÅÏ¢[À©Õ¹½Ó¿Ú]
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              mFileName = MsgObj.GetMsgByName("FILENAME");                        //È¡µÃÎÄµµÃû³Æ
-              mFileType = MsgObj.GetMsgByName("FILETYPE");                        //È¡µÃÎÄµµÀàĞÍ
-              mCommand = MsgObj.GetMsgByName("COMMAND");                          //È¡µÃ×Ô¶¨ÒåµÄ²Ù×÷ÀàĞÍ
-              mContent = MsgObj.GetMsgByName("CONTENT");                          //È¡µÃÎÄ±¾ĞÅÏ¢ Content
-              mOfficePrints = MsgObj.GetMsgByName("OFFICEPRINTS");                //È¡µÃOfficeÎÄµµµÄ´òÓ¡´ÎÊı
-              mInfo = MsgObj.GetMsgByName("TESTINFO");                            //È¡µÃ¿Í»§¶Ë´«À´µÄ×Ô¶¨ÒåĞÅÏ¢
-              MsgObj.MsgTextClear();
-              MsgObj.MsgFileClear();
-              System.out.println("COMMAND:"+mCommand);
-              if (mCommand.equalsIgnoreCase("INPORTTEXT")) {                      //µ¼ÈëÎÄ±¾ÄÚÈİ¹¦ÄÜ
-                if (LoadContent()) {
-                  MsgObj.SetMsgByName("CONTENT", mContent);
-                  MsgObj.SetMsgByName("STATUS", "µ¼Èë³É¹¦!");                     //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                  MsgObj.MsgError("");                                            //Çå³ı´íÎóĞÅÏ¢
-                }
-                else {
-                  MsgObj.MsgError("µ¼ÈëÊ§°Ü!");                                   //ÉèÖÃ´íÎóĞÅÏ¢
-                }
-              }
-              else if (mCommand.equalsIgnoreCase("EXPORTTEXT")) {                 //µ¼³öÎÄ±¾ÄÚÈİ¹¦ÄÜ
-                if (SaveContent()) {
-                  MsgObj.SetMsgByName("STATUS", "µ¼³ö³É¹¦!");                     //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                  MsgObj.MsgError("");                                            //Çå³ı´íÎóĞÅÏ¢
-                }
-                else {
-                  MsgObj.MsgError("µ¼³öÊ§°Ü!");                                   //ÉèÖÃ´íÎóĞÅ
-                }
-              }
-              else if (mCommand.equalsIgnoreCase("WORDTABLE")) {                  //²åÈëÔ¶³Ì±í¸ñ¹¦ÄÜ
-                if (GetWordTable()) {
-                  MsgObj.SetMsgByName("COLUMNS", String.valueOf(mColumns));       //ÁĞ
-                  MsgObj.SetMsgByName("CELLS", String.valueOf(mCells));           //ĞĞ
-                  MsgObj.SetMsgByName("WORDCONTENT", mTableContent);              //±í¸ñÄÚÈİ
-                  MsgObj.SetMsgByName("STATUS", "Ôö¼ÓºÍÌî³ä³É¹¦³É¹¦!");           //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                  MsgObj.MsgError("");                                            //Çå³ı´íÎóĞÅÏ¢
-                }
-                else {
-                  MsgObj.MsgError("Ôö¼Ó±í¸ñĞĞÊ§°Ü!");                             //ÉèÖÃ´íÎóĞÅÏ¢
-                }
-              }
-              else if (mCommand.equalsIgnoreCase("COPIES")) {                     //´òÓ¡·İÊı¿ØÖÆ¹¦ÄÜ
-                System.out.println("PRINTS:"+mOfficePrints);
-                mCopies = Integer.parseInt(mOfficePrints);                        //»ñµÃ¿Í»§ĞèÒª´òÓ¡µÄ·İÊı
-                if (mCopies <= 2) {                                               //±È½Ï´òÓ¡·İÊı£¬Äâ¶¨¸ÃÎÄµµÔÊĞí´òÓ¡µÄ×ÜÊıÎª2·İ£¬×¢£º¿ÉÒÔÔÚÊı¾İ¿âÖĞÉèÖÃºÃÎÄµµÔÊĞí´òÓ¡µÄ·İÊı
-                  if (UpdataCopies(2 - mCopies)) {                                //¸üĞÂ´òÓ¡·İÊı
-                    MsgObj.SetMsgByName("STATUS", "1");                           //ÉèÖÃ×´Ì¬ĞÅÏ¢£¬ÔÊĞí´òÓ¡
-                    MsgObj.MsgError("");                                          //Çå³ı´íÎóĞÅÏ¢
-                  }
-                }
-                else {
-                  MsgObj.SetMsgByName("STATUS", "0");                             //²»ÔÊĞí´òÓ¡
-                  MsgObj.MsgError("³¬¹ı´òÓ¡ÏŞ¶È²»ÔÊĞí´òÓ¡!");                     //ÉèÖÃ´íÎóĞÅÏ¢
-                }
-              }
-              else if (mCommand.equalsIgnoreCase("SELFINFO")) {
-                mInfo = "·şÎñÆ÷¶ËÊÕµ½¿Í»§¶Ë´«À´µÄĞÅÏ¢£º¡°" + mInfo + "¡± | ";                
-                mInfo = mInfo + "µ±Ç°·şÎñÆ÷Ê±¼ä£º" + DbaObj.GetDateTime();        //×éºÏ·µ»Ø¸ø¿Í»§¶ËµÄĞÅÏ¢
-                MsgObj.SetMsgByName("RETURNINFO", mInfo);                         //½«·µ»ØµÄĞÅÏ¢ÉèÖÃµ½ĞÅÏ¢°üÖĞ
-              }
-              else {
-                MsgObj.MsgError("¿Í»§¶ËWeb·¢ËÍÊı¾İ°üÃüÁîÃ»ÓĞºÏÊÊµÄ´¦Àíº¯Êı![" + mCommand + "]");
-                MsgObj.MsgTextClear();
-                MsgObj.MsgFileClear();
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("SAVEPAGE")) {                      //ÏÂÃæµÄ´úÂëÎª±£´æÎªÈ«ÎÄÅú×¢¸ñÊ½ÎÄ¼ş
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              mFilePath = mFilePath + "\\Document\\" + mRecordID + ".pgf";        //È«ÎÄÅú×¢ÎÄ¼şµÄÍêÕûÂ·¾¶
-              if (MsgObj.MsgFileSave(mFilePath)) {                                //±£´æÈ«ÎÄÅú×¢ÎÄ¼ş
-                MsgObj.SetMsgByName("STATUS", "±£´æÈ«ÎÄÅú×¢³É¹¦!");               //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("±£´æÈ«ÎÄÅú×¢Ê§°Ü!");                             //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-
-            else if (mOption.equalsIgnoreCase("LOADPAGE")) {                      //ÏÂÃæµÄ´úÂëÎªµ÷ÈëÈ«ÎÄÅú×¢¸ñÊ½ÎÄ¼ş
-              mRecordID = MsgObj.GetMsgByName("RECORDID");                        //È¡µÃÎÄµµ±àºÅ
-              MsgObj.MsgTextClear();                                              //Çå³ıÎÄ±¾ĞÅÏ¢
-              mFilePath = mFilePath + "\\Document\\" + mRecordID + ".pgf";        //È«ÎÄÅú×¢ÎÄ¼şµÄÍêÕûÂ·¾¶
-              if (MsgObj.MsgFileLoad(mFilePath)) {                                //µ÷ÈëÎÄµµÄÚÈİ
-                MsgObj.SetMsgByName("STATUS", "´ò¿ªÈ«ÎÄÅú×¢³É¹¦!");               //ÉèÖÃ×´Ì¬ĞÅÏ¢
-                MsgObj.MsgError("");                                              //Çå³ı´íÎóĞÅÏ¢
-              }
-              else {
-                MsgObj.MsgError("´ò¿ªÈ«ÎÄÅú×¢Ê§°Ü!");                             //ÉèÖÃ´íÎóĞÅÏ¢
-              }
-            }
-          }
-          else {
-            MsgObj.MsgError("¿Í»§¶Ë·¢ËÍÊı¾İ°ü´íÎó!");
+        //å¢åŠ è¡Œå¹¶å¡«å……è¡¨æ ¼å†…å®¹
+        private boolean GetWordTable() {
+            int i, n;
+            String strI, strN;
+            boolean mResult;
+            mColumns = 3;
+            mCells = 8;
             MsgObj.MsgTextClear();
-            MsgObj.MsgFileClear();
-          }
+            MsgObj.SetMsgByName("COLUMNS", String.valueOf(mColumns)); //è®¾ç½®è¡¨æ ¼è¡Œ
+            MsgObj.SetMsgByName("CELLS", String.valueOf(mCells)); //è®¾ç½®è¡¨æ ¼åˆ—
+            //è¯¥éƒ¨åˆ†å†…å®¹å¯ä»¥ä»æ•°æ®åº“ä¸­è¯»å–
+            try {
+                for (i = 1; i <= mColumns; i++) {
+                    strI = String.valueOf(i);
+                    for (n = 1; n <= mCells; n++) {
+                        MsgObj.SetMsgByName(String.valueOf(i) + String.valueOf(n), "å†…å®¹" + DbaObj.GetDateTime());
+                    }
+                }
+                mResult = true;
+            }
+            catch (Exception e) {
+                System.out.println(e.toString());
+                mResult = false;
+            }
+            return (mResult);
         }
-        else {
-          MsgObj.MsgError("ÇëÊ¹ÓÃPost·½·¨");
-          MsgObj.MsgTextClear();
-          MsgObj.MsgFileClear();
+
+        //æ›´æ–°æ‰“å°ä»½æ•°
+        private boolean UpdataCopies(int mLeftCopies) {
+            boolean mResult = true;
+            //è¯¥å‡½æ•°å¯ä»¥æŠŠæ‰“å°å‡å°‘çš„æ¬¡æ•°è®°å½•åˆ°æ•°æ®åº“
+            //æ ¹æ®è‡ªå·±çš„ç³»ç»Ÿè¿›è¡Œæ‰©å±•è¯¥åŠŸèƒ½
+            return mResult;
         }
-        System.out.println("SendPackage");
-        System.out.println("");
-        //SendPackage(response);                                                    //ÀÏ°æºóÌ¨Àà·µ»ØĞÅÏ¢°üÊı¾İ·½·¨
-        MsgObj.Send(response);                                                    //8.1.0.2ĞÂ°æºóÌ¨ÀàĞÂÔöµÄ¹¦ÄÜ½Ó¿Ú£¬·µ»ØĞÅÏ¢°üÊı¾İ
-      }
-      catch (Exception e) {
-        System.out.println(e.toString());
-      }
+        //==============================â†‘æ‰©å±•åŠŸèƒ½ä»£ç ã€ç»“æŸã€‘â†‘==============================
+
+
+        //==============================â†“æ¥æ”¶æµã€å†™å›æµä»£ç ã€å¼€å§‹ã€‘â†“==============================
+        //å–å¾—å®¢æˆ·ç«¯å‘æ¥çš„æ•°æ®åŒ…
+        private byte[] ReadPackage(HttpServletRequest request) {
+            byte mStream[] = null;
+            int totalRead = 0;
+            int readBytes = 0;
+            int totalBytes = 0;
+            try {
+                totalBytes = request.getContentLength();
+                mStream = new byte[totalBytes];
+                while (totalRead < totalBytes) {
+                    request.getInputStream();
+                    readBytes = request.getInputStream().read(mStream, totalRead, totalBytes - totalRead);
+                    totalRead += readBytes;
+                    continue;
+                }
+            }
+            catch (Exception e) {
+                System.out.println(e.toString());
+            }
+            return (mStream);
+        }
+
+        //å‘é€å¤„ç†åçš„æ•°æ®åŒ…
+        private void SendPackage(HttpServletResponse response) {
+            try {
+                ServletOutputStream OutBinarry = response.getOutputStream();
+                OutBinarry.write(MsgObj.MsgVariant());
+                OutBinarry.flush();
+                OutBinarry.close();
+            }
+            catch (IOException e) {
+                System.out.println(e.toString());
+            }
+        }
+        //==============================â†‘æ¥æ”¶æµã€å†™å›æµä»£ç ã€ç»“æŸã€‘â†‘==============================
+
+
+        public void ExecuteRun(HttpServletRequest request, HttpServletResponse response) {
+            DbaObj = new DBstep.iDBManager2000(); //åˆ›å»ºæ•°æ®åº“å¯¹è±¡
+            MsgObj = new DBstep.iMsgServer2000(); //åˆ›å»ºä¿¡æ¯åŒ…å¯¹è±¡
+            mOption = "";
+            mRecordID = "";
+            mTemplate = "";
+            mFileBody = null;
+            mFileName = "";
+            mFileType = "";
+            mFileSize = 0;
+            mFileID = "";
+            mDateTime = "";
+            mMarkName = "";
+            mPassword = "";
+            mMarkList = "";
+            mBookmark = "";
+            mMarkGuid = "";
+            mDescript = "";
+            mCommand = "";
+            mContent = "";
+            mLabelName = "";
+            mImageName = "";
+            mTableContent = "";
+            mMyDefine1 = "";
+            mOfficePrints = "0";
+            mFilePath = request.getSession().getServletContext().getRealPath("");       //å–å¾—æœåŠ¡å™¨è·¯å¾„
+            System.out.println("ReadPackage");
+
+            try {
+                System.out.println("==request.getMethod()==" + request.getMethod());
+                if (request.getMethod().equalsIgnoreCase("POST")) {
+                    //MsgObj.MsgVariant(ReadPackage(request));                              //è€ç‰ˆæœ¬åå°ç±»ï¼Œä¸æ”¯æŒUTF-8ç¼–ç è‡ªé€‚åº”åŠŸèƒ½
+                    MsgObj.Load(request);                                                   //8.1.0.2ç‰ˆåå°ç±»æ–°å¢è§£ææ¥å£ï¼Œå¯æ”¯æŒUTF-8ç¼–ç è‡ªé€‚åº”åŠŸèƒ½
+                    System.out.println("==DBSTEP==" + MsgObj.GetMsgByName("DBSTEP"));
+                    //å–å¾—æ–‡æ¡£åç§°
+                    System.out.println("FILENAME:"+ MsgObj.GetMsgByName("FILENAME"));
+                    if (MsgObj.GetMsgByName("DBSTEP").equalsIgnoreCase("DBSTEP")) {         //åˆ¤æ–­æ˜¯å¦æ˜¯åˆæ³•çš„ä¿¡æ¯åŒ…ï¼Œæˆ–è€…æ•°æ®åŒ…ä¿¡æ¯æ˜¯å¦å®Œæ•´
+                        mOption = MsgObj.GetMsgByName("OPTION");                              //å–å¾—æ“ä½œä¿¡æ¯
+                        mUserName = MsgObj.GetMsgByName("USERNAME");                          //å–å¾—ç³»ç»Ÿç”¨æˆ·
+                        System.out.println("OPTION:"+mOption);                                //æ‰“å°å‡ºè°ƒè¯•ä¿¡æ¯
+                        if (mOption.equalsIgnoreCase("LOADFILE")) {                           //ä¸‹é¢çš„ä»£ç ä¸ºæ‰“å¼€æœåŠ¡å™¨æ•°æ®åº“é‡Œçš„æ–‡ä»¶
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mFileName = MsgObj.GetMsgByName("FILENAME");                        //å–å¾—æ–‡æ¡£åç§°
+                            System.out.println("FILENAME:"+mFileName);
+                            mFileType = MsgObj.GetMsgByName("FILETYPE");                        //å–å¾—æ–‡æ¡£ç±»å‹
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            //if (MsgObj.MsgFileLoad(mFilePath+"\\"+mFileName))			            //ä»æ–‡ä»¶å¤¹è°ƒå…¥æ–‡æ¡£
+                            System.out.println("Begin  if (LoadFile()) ");
+                            if (LoadFile()) {                                                   //ä»æ•°æ®åº“è°ƒå…¥æ–‡æ¡£
+                                MsgObj.MsgFileBody(mFileBody);                                    //å°†æ–‡ä»¶ä¿¡æ¯æ‰“åŒ…
+                                MsgObj.SetMsgByName("STATUS", "æ‰“å¼€æˆåŠŸ!");                       //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                                System.out.println("LoadFile() success ["+mFileBody+"]");
+                            }
+                            else {
+                                System.out.println("LoadFile() æ‰“å¼€å¤±è´¥ ");
+                                MsgObj.MsgError("loadFile Fail!");                                     //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("SAVEFILE")) {                      //ä¸‹é¢çš„ä»£ç ä¸ºä¿å­˜æ–‡ä»¶åœ¨æœåŠ¡å™¨çš„æ•°æ®åº“é‡Œ
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mFileName = MsgObj.GetMsgByName("FILENAME");                        //å–å¾—æ–‡æ¡£åç§°
+                            mFileType = MsgObj.GetMsgByName("FILETYPE");                        //å–å¾—æ–‡æ¡£ç±»å‹
+                            mUserName = mUserName;                                              //å–å¾—ä¿å­˜ç”¨æˆ·åç§°
+                            mDescript = "é€šç”¨ç‰ˆæœ¬";                                             //ç‰ˆæœ¬è¯´æ˜
+                            mFileSize = MsgObj.MsgFileSize();                                   //å–å¾—æ–‡æ¡£å¤§å°
+                            mFileDate = DbaObj.GetDateTime();                                   //å–å¾—æ–‡æ¡£æ—¶é—´
+                            mFileBody = MsgObj.MsgFileBody();                                   //å–å¾—æ–‡æ¡£å†…å®¹
+                            String moduleType = MsgObj.GetMsgByName("moduleType");
+                            String isDoc = MsgObj.GetMsgByName("isDoc");
+                            System.out.println("ä¼ å…¥isDocï¼š"+isDoc+ "---moduleType"+moduleType+"---å€¼"+isDoc.equals("")+",,,,"+(isDoc==null));
+
+                            System.out.println("mRecordID=================="+mRecordID);
+                            System.out.println("mFileName=================="+mFileName);
+                            System.out.println("mFileType=================="+mFileType);
+
+                            String isEmpty = MsgObj.GetMsgByName("EMPTY");                      //æ˜¯å¦æ˜¯ç©ºå†…å®¹æ–‡æ¡£çš„æ ‡è¯†
+                            if(isEmpty.equalsIgnoreCase("TRUE")){
+                                //æ­¤æ—¶æ¥æ”¶çš„æ–‡æ¡£ä¸­å†…å®¹æ˜¯ç©ºç™½çš„ï¼Œè¯·ç”¨æ—¥å¿—è®°å½•ä¿å­˜æ—¶é—´ã€ä¿å­˜ç”¨æˆ·ã€è®°å½•ç¼–å·ç­‰ä¿¡æ¯ï¼Œç”¨äºå°†æ¥å‘ç°æ–‡æ¡£å†…å®¹ä¸¢å¤±æ—¶æ’æŸ¥ç”¨ã€‚
+                                System.out.println("æ³¨æ„ï¼šæœ¬æ¬¡ä¿å­˜çš„æ˜¯ç©ºç™½å†…å®¹çš„æ–‡æ¡£ã€‚RECORDIDï¼š"+mRecordID);
+                            }
+                            System.out.println("1111111111111111==================");
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            //if (MsgObj.MsgFileSave(mFilePath+"\\"+mFileName))			            //ä¿å­˜æ–‡æ¡£å†…å®¹åˆ°æ–‡ä»¶å¤¹ä¸­
+                            System.out.println("222222222222222222==================");
+                            if(isDoc.equals("false") || isDoc.equals("") || isDoc ==null){
+                                if (SaveFile()) {                                                   //ä¿å­˜æ–‡æ¡£å†…å®¹åˆ°æ•°æ®åº“ä¸­
+                                    MsgObj.SetMsgByName("STATUS", "ä¿å­˜æˆåŠŸ!");                       //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                    MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                                }
+                                else {
+                                    MsgObj.MsgError("ä¿å­˜å¤±è´¥!");                                     //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                                }
+                            }else if(isDoc.equals("true")){
+                                System.out.println("save file start -----------");
+                                String myPath = this.mFilePath +
+                                        "//iWebOfficeSign//Document";
+                                if (moduleType.equals("information")) {
+                                    myPath = this.mFilePath + "//upload//information";
+                                } else if (moduleType.equals("govdocument")) {
+                                    myPath = this.mFilePath +
+                                            "//upload//govdocumentmanager";
+                                }
+                                else if (moduleType.indexOf("dossier") > -1) {
+                                    myPath = this.mFilePath + "//upload//dossier" +
+                                            "//sendType" +
+                                            moduleType.substring(moduleType
+                                                    .indexOf("dossier") + 7);
+                                    try {
+                                        File myFilePath = new File(
+                                                myPath);
+                                        if (!myFilePath.exists())
+                                            myFilePath.mkdir();
+                                    }
+                                    catch (Exception e) {
+                                        System.out.println("æ–°å»ºç›®å½•æ“ä½œå‡ºé”™");
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    myPath = this.mFilePath +
+                                            "//upload//" + moduleType;
+                                }
+                                System.out.println("myPath #####:"+myPath);
+                                try{
+                                    this.MsgObj.MsgFileSave(myPath + "//" + this.mRecordID +
+                                            this.mFileType);
+                                    System.out.println(" after  MsgFileSave ");
+                                    SysSetupReader sss = new SysSetupReader();
+                                    System.out.println(" wwwwww====== ");
+                                    Map sysMap =
+                                            SysSetupReader.getInstance()
+                                                    .getSysSetupMap("0");
+                                    System.out.println(" wwwwww2222222====== ");
+                                    System.out.println(" sysMap "+sysMap);
+                                    if ((sysMap != null) && (sysMap.get("é™„ä»¶ä¸Šä¼ ") != null) &&
+                                            (sysMap.get("é™„ä»¶ä¸Šä¼ ").toString().equals("0")) &&
+                                            (moduleType.indexOf("dossier") < 0)) {
+
+                                    } else {
+                                        System.out.println("sysMap @@@@:"+sysMap);
+                                        SysSetupReader sysRed = SysSetupReader.getInstance();
+                                        Map sysMap2 = sysRed.getSysSetupMap("0");
+
+                                        String isEncrypt = (String)sysMap2.get("åŠ å¯†å­˜å‚¨");
+                                        if (isEncrypt == null) isEncrypt = "0";
+                                        System.out.println("isEncrypt: "+isEncrypt);
+                                        UploadFile upFile =
+                                                new UploadFile();
+                                        System.out.println("ä¿å­˜ç‰©ç†æ–‡ä»¶æ–¹æ³•-----------mRecordID"+this.mRecordID+"----mFileType"+this.mFileType);
+                                        upFile.setFileSize(this.mRecordID + this.mFileType,
+                                                this.mFileSize, moduleType.equals("govdocument") ? "govdocumentmanager" : moduleType,
+                                                request, isEncrypt.equals("1"));
+                                    }
+                                }catch(Exception e){
+                                    System.out.println("error");
+                                    e.printStackTrace();
+                                }
+
+                                System.out.println("ä¿å­˜ç‰©ç†æ–‡ä»¶ç»“æŸ-----------");
+                            }
+                            System.out.println("44444444444444444==================");
+                            MsgObj.MsgFileClear();                                              //æ¸…é™¤æ–‡æ¡£å†…å®¹
+                        }
+
+                        else if (mOption.equalsIgnoreCase("LOADTEMPLATE")) {                  //ä¸‹é¢çš„ä»£ç ä¸ºæ‰“å¼€æœåŠ¡å™¨æ•°æ®åº“é‡Œçš„æ¨¡æ¿æ–‡ä»¶
+                            mTemplate = MsgObj.GetMsgByName("TEMPLATE");                        //å–å¾—æ¨¡æ¿æ–‡æ¡£ç±»å‹
+                            //æœ¬æ®µå¤„ç†æ˜¯å¦è°ƒç”¨æ–‡æ¡£æ—¶æ‰“å¼€æ¨¡ç‰ˆï¼Œè¿˜æ˜¯å¥—ç”¨æ¨¡ç‰ˆæ—¶æ‰“å¼€æ¨¡ç‰ˆã€‚
+                            mCommand = MsgObj.GetMsgByName("COMMAND");                          //å–å¾—å®¢æˆ·ç«¯å®šä¹‰çš„å˜é‡COMMANDå€¼
+                            if (mCommand.equalsIgnoreCase("INSERTFILE")) {
+                                if (MsgObj.MsgFileLoad(mFilePath + "\\Document\\" + mTemplate)) { //ä»æœåŠ¡å™¨æ–‡ä»¶å¤¹ä¸­è°ƒå…¥æ¨¡æ¿æ–‡æ¡£
+                                    MsgObj.SetMsgByName("STATUS", "æ‰“å¼€æ¨¡æ¿æˆåŠŸ!");                 //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                    MsgObj.MsgError("");                                            //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                                }
+                                else {
+                                    MsgObj.MsgError("æ‰“å¼€æ¨¡æ¿å¤±è´¥!");                               //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                                }
+                            }
+                            else {
+                                MsgObj.MsgTextClear();                                            //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                                if (LoadTemplate()) {                                             //è°ƒå…¥æ¨¡æ¿æ–‡æ¡£
+                                    MsgObj.MsgFileBody(mFileBody);                                  //å°†æ–‡ä»¶ä¿¡æ¯æ‰“åŒ…
+                                    MsgObj.SetMsgByName("STATUS", "æ‰“å¼€æ¨¡æ¿æˆåŠŸ!");                 //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                    MsgObj.MsgError("");                                            //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                                }
+                                else {
+                                    MsgObj.MsgError("æ‰“å¼€æ¨¡æ¿å¤±è´¥!");                               //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                                }
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("SAVETEMPLATE")) {                  //ä¸‹é¢çš„ä»£ç ä¸ºä¿å­˜æ¨¡æ¿æ–‡ä»¶åœ¨æœåŠ¡å™¨çš„æ•°æ®åº“é‡Œ
+                            mTemplate = MsgObj.GetMsgByName("TEMPLATE");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mFileName = MsgObj.GetMsgByName("FILENAME");                        //å–å¾—æ–‡æ¡£åç§°
+                            mFileType = MsgObj.GetMsgByName("FILETYPE");                        //å–å¾—æ–‡æ¡£ç±»å‹
+                            mUserName = mUserName;                                              //å–å¾—ä¿å­˜ç”¨æˆ·åç§°
+                            mDescript = "é€šç”¨æ¨¡æ¿";                                             //ç‰ˆæœ¬è¯´æ˜
+                            mFileSize = MsgObj.MsgFileSize();                                   //å–å¾—æ–‡æ¡£å¤§å°
+                            mFileDate = DbaObj.GetDateTime();                                   //å–å¾—æ–‡æ¡£æ—¶é—´
+                            mFileBody = MsgObj.MsgFileBody();                                   //å–å¾—æ–‡æ¡£å†…å®¹
+                            MsgObj.MsgTextClear();
+                            if (SaveTemplate()) {                                               //ä¿å­˜æ¨¡æ¿æ–‡æ¡£å†…å®¹
+                                MsgObj.SetMsgByName("STATUS", "ä¿å­˜æ¨¡æ¿æˆåŠŸ!");                   //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¿å­˜æ¨¡æ¿å¤±è´¥!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                            MsgObj.MsgFileClear();
+                        }
+
+                        else if (mOption.equalsIgnoreCase("LISTVERSION")) {                   //ä¸‹é¢çš„ä»£ç ä¸ºæ‰“å¼€ç‰ˆæœ¬åˆ—è¡¨
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            MsgObj.MsgTextClear();
+                            if (ListVersion()) {                                                //ç”Ÿæˆç‰ˆæœ¬åˆ—è¡¨
+                                MsgObj.SetMsgByName("FILEID", mFileID);                           //å°†æ–‡æ¡£å·åˆ—è¡¨æ‰“åŒ…
+                                MsgObj.SetMsgByName("DATETIME", mDateTime);                       //å°†æ—¥æœŸæ—¶é—´åˆ—è¡¨æ‰“åŒ…
+                                MsgObj.SetMsgByName("USERNAME", mUserName);                       //å°†ç”¨æˆ·ååˆ—è¡¨æ‰“åŒ…
+                                MsgObj.SetMsgByName("DESCRIPT", mDescript);                       //å°†è¯´æ˜ä¿¡æ¯åˆ—è¡¨æ‰“åŒ…
+                                MsgObj.SetMsgByName("STATUS", "ç‰ˆæœ¬åˆ—è¡¨æˆåŠŸ!");                   //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ç‰ˆæœ¬åˆ—è¡¨å¤±è´¥!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("LOADVERSION")) {                   //ä¸‹é¢çš„ä»£ç ä¸ºæ‰“å¼€ç‰ˆæœ¬æ–‡æ¡£
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mFileID = MsgObj.GetMsgByName("FILEID");                            //å–å¾—ç‰ˆæœ¬æ–‡æ¡£å·
+                            MsgObj.MsgTextClear();
+                            if (LoadVersion(mFileID)) {                                         //è°ƒå…¥è¯¥ç‰ˆæœ¬æ–‡æ¡£
+                                MsgObj.MsgFileBody(mFileBody);                                    //å°†æ–‡æ¡£ä¿¡æ¯æ‰“åŒ…
+                                MsgObj.SetMsgByName("STATUS", "æ‰“å¼€ç‰ˆæœ¬æˆåŠŸ!");                   //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("æ‰“å¼€ç‰ˆæœ¬å¤±è´¥!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("SAVEVERSION")) {                   //ä¸‹é¢çš„ä»£ç ä¸ºä¿å­˜ç‰ˆæœ¬æ–‡æ¡£
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mFileID = MsgObj.GetMsgByName("FILEID");                            //å–å¾—ç‰ˆæœ¬æ–‡æ¡£å·   å¦‚:WebSaveVersionByFileIDï¼Œåˆ™FileIDå€¼å­˜åœ¨
+                            mFileName = MsgObj.GetMsgByName("FILENAME");                        //å–å¾—æ–‡æ¡£åç§°
+                            mFileType = MsgObj.GetMsgByName("FILETYPE");                        //å–å¾—æ–‡æ¡£ç±»å‹
+                            mUserName = mUserName;                                              //å–å¾—ä¿å­˜ç”¨æˆ·åç§°
+                            mDescript = MsgObj.GetMsgByName("DESCRIPT");                        //å–å¾—è¯´æ˜ä¿¡æ¯
+                            mFileSize = MsgObj.MsgFileSize();                                   //å–å¾—æ–‡æ¡£å¤§å°
+                            mFileDate = DbaObj.GetDateTime();                                   //å–å¾—æ–‡æ¡£æ—¶é—´
+                            mFileBody = MsgObj.MsgFileBody();                                   //å–å¾—æ–‡æ¡£å†…å®¹
+                            MsgObj.MsgTextClear();
+                            if (SaveVersion()) {                                                //ä¿å­˜ç‰ˆæœ¬æ–‡æ¡£
+                                MsgObj.SetMsgByName("STATUS", "ä¿å­˜ç‰ˆæœ¬æˆåŠŸ!");                   //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¿å­˜ç‰ˆæœ¬å¤±è´¥!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                            MsgObj.MsgFileClear();                                              //æ¸…é™¤æ–‡æ¡£å†…å®¹
+                        }
+
+                        else if (mOption.equalsIgnoreCase("LOADBOOKMARKS")) {                 //ä¸‹é¢çš„ä»£ç ä¸ºå–å¾—æ–‡æ¡£æ ‡ç­¾
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mTemplate = MsgObj.GetMsgByName("TEMPLATE");                        //å–å¾—æ¨¡æ¿ç¼–å·
+                            mFileName = MsgObj.GetMsgByName("FILENAME");                        //å–å¾—æ–‡æ¡£åç§°
+                            mFileType = MsgObj.GetMsgByName("FILETYPE");                        //å–å¾—æ–‡æ¡£ç±»å‹
+                            MsgObj.MsgTextClear();
+                            if (LoadBookMarks()) {
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("è£…å…¥æ ‡ç­¾ä¿¡æ¯å¤±è´¥!");                             //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("SAVEBOOKMARKS")) {                 //ä¸‹é¢çš„ä»£ç ä¸ºå–å¾—æ ‡ç­¾æ–‡æ¡£å†…å®¹
+                            mTemplate = MsgObj.GetMsgByName("TEMPLATE");                        //å–å¾—æ¨¡æ¿ç¼–å·
+                            if (SaveBookMarks()) {
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¿å­˜æ ‡ç­¾ä¿¡æ¯å¤±è´¥!");                             //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                        }
+
+                        else if (mOption.equalsIgnoreCase("LISTBOOKMARKS")) {                 //ä¸‹é¢çš„ä»£ç ä¸ºæ˜¾ç¤ºæ ‡ç­¾åˆ—è¡¨
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            if (ListBookmarks()) {
+                                MsgObj.SetMsgByName("BOOKMARK", mBookmark);                       //å°†ç”¨æˆ·ååˆ—è¡¨æ‰“åŒ…
+                                MsgObj.SetMsgByName("DESCRIPT", mDescript);                       //å°†è¯´æ˜ä¿¡æ¯åˆ—è¡¨æ‰“åŒ…
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("è°ƒå…¥æ ‡ç­¾å¤±è´¥!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("LOADMARKLIST")) {                  //ä¸‹é¢çš„ä»£ç ä¸ºåˆ›å»ºå°ç« åˆ—è¡¨
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            if (LoadMarkList()) {
+                                MsgObj.SetMsgByName("MARKLIST", mMarkList);                       //æ˜¾ç¤ºç­¾ç« åˆ—è¡¨
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("åˆ›å»ºå°ç« åˆ—è¡¨å¤±è´¥!");                             //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("LOADMARKIMAGE")) {                 //ä¸‹é¢çš„ä»£ç ä¸ºæ‰“å¼€å°ç« æ–‡ä»¶
+                            mMarkName = MsgObj.GetMsgByName("IMAGENAME");                       //å–å¾—ç­¾ååç§°
+                            mUserName = MsgObj.GetMsgByName("USERNAME");                        //å–å¾—ç”¨æˆ·åç§°
+                            mPassword = MsgObj.GetMsgByName("PASSWORD");                        //å–å¾—ç”¨æˆ·å¯†ç 
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            if (LoadMarkImage(mMarkName, mPassword)) {                          //è°ƒå…¥ç­¾åä¿¡æ¯
+                                MsgObj.SetMsgByName("IMAGETYPE", mFileType);                      //è®¾ç½®ç­¾åç±»å‹
+                                MsgObj.MsgFileBody(mFileBody);                                    //å°†ç­¾åä¿¡æ¯æ‰“åŒ…
+                                MsgObj.SetMsgByName("POSITION", "Manager");                       //æ’å…¥ä½ç½®  åœ¨æ–‡æ¡£ä¸­æ ‡ç­¾"Manager"
+                                MsgObj.SetMsgByName("ZORDER", "5");                               //4:åœ¨æ–‡å­—ä¸Šæ–¹ 5:åœ¨æ–‡å­—ä¸‹æ–¹
+                                MsgObj.SetMsgByName("STATUS", "æ‰“å¼€æˆåŠŸ!");                       //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ç­¾åæˆ–å¯†ç é”™è¯¯!");                               //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("SAVESIGNATURE")) {                 //ä¸‹é¢çš„ä»£ç ä¸ºä¿å­˜ç­¾ç« åŸºæœ¬ä¿¡æ¯
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mFileName = MsgObj.GetMsgByName("FILENAME");                        //å–å¾—æ–‡ä»¶åç§°
+                            mMarkName = MsgObj.GetMsgByName("MARKNAME");                        //å–å¾—ç­¾ååç§°
+                            mUserName = MsgObj.GetMsgByName("USERNAME");                        //å–å¾—ç”¨æˆ·åç§°
+                            mDateTime = MsgObj.GetMsgByName("DATETIME");                        //å–å¾—ç­¾åæ—¶é—´
+                            mHostName = request.getRemoteAddr();                                //å–å¾—ç”¨æˆ·IP
+                            mMarkGuid = MsgObj.GetMsgByName("MARKGUID");                        //å–å¾—å”¯ä¸€ç¼–å·
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            if (SaveSignature()) {                                              //ä¿å­˜ç­¾ç« 
+                                MsgObj.SetMsgByName("STATUS", "ä¿å­˜å°ç« æˆåŠŸ!");                   //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¿å­˜å°ç« å¤±è´¥!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("LOADSIGNATURE")) {                 //ä¸‹é¢çš„ä»£ç ä¸ºè°ƒå‡ºç­¾ç« åŸºæœ¬ä¿¡æ¯
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            if (LoadSignature()) {                                              //è°ƒå‡ºç­¾ç« 
+                                MsgObj.SetMsgByName("MARKNAME", mMarkName);                       //å°†ç­¾ååç§°åˆ—è¡¨æ‰“åŒ…
+                                MsgObj.SetMsgByName("USERNAME", mUserName);                       //å°†ç”¨æˆ·ååˆ—è¡¨æ‰“åŒ…
+                                MsgObj.SetMsgByName("DATETIME", mDateTime);                       //å°†æ—¶é—´åˆ—è¡¨æ‰“åŒ…
+                                MsgObj.SetMsgByName("HOSTNAME", mHostName);                       //å°†ç›–ç« IPåœ°å€åˆ—è¡¨æ‰“åŒ…
+                                MsgObj.SetMsgByName("MARKGUID", mMarkGuid);                       //å°†å”¯ä¸€ç¼–å·åˆ—è¡¨æ‰“åŒ…
+                                MsgObj.SetMsgByName("STATUS", "è°ƒå…¥å°ç« æˆåŠŸ!");                   //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("è°ƒå…¥å°ç« å¤±è´¥!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if(mOption.equalsIgnoreCase("SAVEPDF")){	                        //ä¸‹é¢çš„ä»£ç ä¸ºä¿å­˜PDFæ–‡ä»¶
+                            mRecordID=MsgObj.GetMsgByName("RECORDID");	                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mFileName=MsgObj.GetMsgByName("FILENAME");	                        //å–å¾—æ–‡æ¡£åç§°
+                            MsgObj.MsgTextClear();					                                    //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            if (MsgObj.MsgFileSave(mFilePath+"\\Document\\"+mRecordID+".pdf")){ //ä¿å­˜æ–‡æ¡£åˆ°æ–‡ä»¶å¤¹ä¸­
+                                MsgObj.SetMsgByName("STATUS", "ä¿å­˜æˆåŠŸ!");                       //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");					                                    //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¿å­˜å¤±è´¥!");			                                //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                            MsgObj.MsgFileClear();					                                    //æ¸…é™¤æ–‡æ¡£å†…å®¹
+                        }
+
+                        else if (mOption.equalsIgnoreCase("SAVEASHTML")) {                    //ä¸‹é¢çš„ä»£ç ä¸ºå°†OFFICEå­˜ä¸ºHTMLé¡µé¢
+                            mHtmlName = MsgObj.GetMsgByName("HTMLNAME");                        //å–å¾—æ–‡ä»¶åç§°
+                            mDirectory = MsgObj.GetMsgByName("DIRECTORY");                      //å–å¾—ç›®å½•åç§°
+                            MsgObj.MsgTextClear();
+                            if (mDirectory.trim().equalsIgnoreCase("")) {
+                                mFilePath = mFilePath + "\\HTML";
+                            }
+                            else {
+                                mFilePath = mFilePath + "\\HTML\\" + mDirectory;
+                            }
+                            MsgObj.MakeDirectory(mFilePath);                                    //åˆ›å»ºè·¯å¾„
+                            if (MsgObj.MsgFileSave(mFilePath + "\\" + mHtmlName)) {             //ä¿å­˜HTMLæ–‡ä»¶
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                                MsgObj.SetMsgByName("STATUS", "ä¿å­˜HTMLæˆåŠŸ!");                   //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¿å­˜HTMLå¤±è´¥!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                            MsgObj.MsgFileClear();
+                        }
+
+                        else if (mOption.equalsIgnoreCase("SAVEIMAGE")) {                     //ä¸‹é¢çš„ä»£ç ä¸ºå°†OFFICEå­˜ä¸ºHTMLå›¾ç‰‡é¡µé¢
+                            mHtmlName = MsgObj.GetMsgByName("HTMLNAME");                        //å–å¾—æ–‡ä»¶åç§°
+                            mDirectory = MsgObj.GetMsgByName("DIRECTORY");                      //å–å¾—ç›®å½•åç§°
+                            MsgObj.MsgTextClear();
+                            if (mDirectory.trim().equalsIgnoreCase("")) {
+                                mFilePath = mFilePath + "\\HTMLIMAGE";
+                            }
+                            else {
+                                mFilePath = mFilePath + "\\HTMLIMAGE\\" + mDirectory;
+                            }
+                            MsgObj.MakeDirectory(mFilePath);                                    //åˆ›å»ºè·¯å¾„
+                            if (MsgObj.MsgFileSave(mFilePath + "\\" + mHtmlName)) {             //ä¿å­˜HTMLæ–‡ä»¶
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                                MsgObj.SetMsgByName("STATUS", "ä¿å­˜HTMLå›¾ç‰‡æˆåŠŸ!");               //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¿å­˜HTMLå›¾ç‰‡å¤±è´¥!");                             //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                            MsgObj.MsgFileClear();
+                        }
+
+                        else if (mOption.equalsIgnoreCase("SAVEASPAGE")) {                    //ä¸‹é¢çš„ä»£ç ä¸ºå°†æ‰‹å†™æ‰¹æ³¨å­˜ä¸ºHTMLå›¾ç‰‡é¡µé¢
+                            mHtmlName = MsgObj.GetMsgByName("HTMLNAME");                        //å–å¾—æ–‡ä»¶åç§°
+                            mDirectory = MsgObj.GetMsgByName("DIRECTORY");                      //å–å¾—ç›®å½•åç§°
+                            MsgObj.MsgTextClear();
+                            if (mDirectory.trim().equalsIgnoreCase("")) {
+                                mFilePath = mFilePath + "\\HTML";
+                            }
+                            else {
+                                mFilePath = mFilePath + "\\HTML\\" + mDirectory;
+                            }
+                            MsgObj.MakeDirectory(mFilePath);                                    //åˆ›å»ºè·¯å¾„
+                            if (MsgObj.MsgFileSave(mFilePath + "\\" + mHtmlName)) {             //ä¿å­˜HTMLæ–‡ä»¶
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                                MsgObj.SetMsgByName("STATUS", "ä¿å­˜æ‰¹æ³¨HTMLå›¾ç‰‡æˆåŠŸ!");           //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¿å­˜æ‰¹æ³¨HTMLå›¾ç‰‡å¤±è´¥!");                         //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                            MsgObj.MsgFileClear();
+                        }
+
+                        else if (mOption.equalsIgnoreCase("INSERTFILE")) {                    //ä¸‹é¢çš„ä»£ç ä¸ºæ’å…¥æ–‡ä»¶
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mFileName = MsgObj.GetMsgByName("FILENAME");                        //å–å¾—æ–‡æ¡£åç§°
+                            mFileType = MsgObj.GetMsgByName("FILETYPE");                        //å–å¾—æ–‡æ¡£ç±»å‹
+                            MsgObj.MsgTextClear();
+                            if (LoadFile()) {                                                   //è°ƒå…¥æ–‡æ¡£
+                                MsgObj.MsgFileBody(mFileBody);                                    //å°†æ–‡ä»¶ä¿¡æ¯æ‰“åŒ…
+                                MsgObj.SetMsgByName("POSITION", "Content");                       //è®¾ç½®æ’å…¥çš„ä½ç½®[ä¹¦ç­¾]
+                                MsgObj.SetMsgByName("STATUS", "æ’å…¥æ–‡ä»¶æˆåŠŸ!");                   //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("æ’å…¥æ–‡ä»¶æˆåŠŸ!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("UPDATEFILE")) {                    //ä¸‹é¢çš„ä»£ç ä¸ºæ›´æ–°ä¿å­˜æ–‡ä»¶
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mFileName = MsgObj.GetMsgByName("FILENAME");                        //å–å¾—æ–‡æ¡£åç§°
+                            mFileType = MsgObj.GetMsgByName("FILETYPE");                        //å–å¾—æ–‡æ¡£ç±»å‹
+                            mUserName = mUserName;                                              //å–å¾—ä¿å­˜ç”¨æˆ·åç§°
+                            mDescript = "å®šç¨¿ç‰ˆæœ¬";                                             //ç‰ˆæœ¬è¯´æ˜
+                            mFileSize = MsgObj.MsgFileSize();                                   //å–å¾—æ–‡æ¡£å¤§å°
+                            mFileDate = DbaObj.GetDateTime();                                   //å–å¾—æ–‡æ¡£æ—¶é—´
+                            mFileBody = MsgObj.MsgFileBody();                                   //å–å¾—æ–‡æ¡£å†…å®¹
+                            MsgObj.MsgTextClear();
+                            if (SaveVersion()) {                                                //ä¿å­˜æ–‡æ¡£å†…å®¹
+                                MsgObj.SetMsgByName("STATUS", "ä¿å­˜å®šç¨¿ç‰ˆæœ¬æˆåŠŸ!");               //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¿å­˜å®šç¨¿ç‰ˆæœ¬å¤±è´¥!");                             //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                            MsgObj.MsgFileClear();
+                        }
+
+                        else if (mOption.equalsIgnoreCase("INSERTIMAGE")) {                   //ä¸‹é¢çš„ä»£ç ä¸ºæ’å…¥æœåŠ¡å™¨å›¾ç‰‡
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mLabelName = MsgObj.GetMsgByName("LABELNAME");                      //æ ‡ç­¾å
+                            mImageName = MsgObj.GetMsgByName("IMAGENAME");                      //å›¾ç‰‡å
+                            mFilePath = mFilePath + "\\Document\\" + mImageName;                //å›¾ç‰‡åœ¨æœåŠ¡å™¨çš„å®Œæ•´è·¯å¾„
+                            mFileType = mImageName.substring(mImageName.length() - 4).toLowerCase(); //å–å¾—æ–‡ä»¶çš„ç±»å‹
+                            MsgObj.MsgTextClear();
+                            if (MsgObj.MsgFileLoad(mFilePath)) {                                //è°ƒå…¥å›¾ç‰‡
+                                MsgObj.SetMsgByName("IMAGETYPE", mFileType);                      //æŒ‡å®šå›¾ç‰‡çš„ç±»å‹
+                                MsgObj.SetMsgByName("POSITION", mLabelName);                      //è®¾ç½®æ’å…¥çš„ä½ç½®[ä¹¦ç­¾å¯¹è±¡å]
+                                MsgObj.SetMsgByName("STATUS", "æ’å…¥å›¾ç‰‡æˆåŠŸ!");                   //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("æ’å…¥å›¾ç‰‡å¤±è´¥!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("PUTFILE")) {                       //ä¸‹é¢çš„ä»£ç ä¸ºè¯·æ±‚ä¸Šä¼ æ–‡ä»¶æ“ä½œ
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mFileBody = MsgObj.MsgFileBody();                                   //å–å¾—æ–‡æ¡£å†…å®¹
+                            mLocalFile = MsgObj.GetMsgByName("LOCALFILE");                      //å–å¾—æœ¬åœ°æ–‡ä»¶åç§°
+                            mRemoteFile = MsgObj.GetMsgByName("REMOTEFILE");                    //å–å¾—è¿œç¨‹æ–‡ä»¶åç§°
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            mFilePath = mFilePath + "\\Document\\" + mRemoteFile;
+                            if (MsgObj.MsgFileSave(mFilePath)) {                                //è°ƒå…¥æ–‡æ¡£
+                                MsgObj.SetMsgByName("STATUS", "ä¿å­˜ä¸Šä¼ æ–‡ä»¶æˆåŠŸ!");               //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¸Šä¼ æ–‡ä»¶å¤±è´¥!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("GETFILE")) {                       //ä¸‹é¢çš„ä»£ç ä¸ºè¯·æ±‚ä¸‹è½½æ–‡ä»¶æ“ä½œ
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mLocalFile = MsgObj.GetMsgByName("LOCALFILE");                      //å–å¾—æœ¬åœ°æ–‡ä»¶åç§°
+                            mRemoteFile = MsgObj.GetMsgByName("REMOTEFILE");                    //å–å¾—è¿œç¨‹æ–‡ä»¶åç§°
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            mFilePath = mFilePath + "\\Document\\" + mRemoteFile;
+                            if (MsgObj.MsgFileLoad(mFilePath)) {                                //è°ƒå…¥æ–‡æ¡£å†…å®¹
+                                MsgObj.SetMsgByName("STATUS", "ä¿å­˜ä¸‹è½½æ–‡ä»¶æˆåŠŸ!");               //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¸‹è½½æ–‡ä»¶å¤±è´¥!");                                 //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("DATETIME")) {                      //ä¸‹é¢çš„ä»£ç ä¸ºè¯·æ±‚å–å¾—æœåŠ¡å™¨æ—¶é—´
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            MsgObj.SetMsgByName("DATETIME", DbaObj.GetDateTime());              //æ ‡å‡†æ—¥æœŸæ ¼å¼å­—ä¸²ï¼Œå¦‚ 2005-8-16 10:20:35
+                        }
+
+                        else if (mOption.equalsIgnoreCase("SENDMESSAGE")) {                   //ä¸‹é¢çš„ä»£ç ä¸ºWebé¡µé¢è¯·æ±‚ä¿¡æ¯[æ‰©å±•æ¥å£]
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            mFileName = MsgObj.GetMsgByName("FILENAME");                        //å–å¾—æ–‡æ¡£åç§°
+                            mFileType = MsgObj.GetMsgByName("FILETYPE");                        //å–å¾—æ–‡æ¡£ç±»å‹
+                            mCommand = MsgObj.GetMsgByName("COMMAND");                          //å–å¾—è‡ªå®šä¹‰çš„æ“ä½œç±»å‹
+                            mContent = MsgObj.GetMsgByName("CONTENT");                          //å–å¾—æ–‡æœ¬ä¿¡æ¯ Content
+                            mOfficePrints = MsgObj.GetMsgByName("OFFICEPRINTS");                //å–å¾—Officeæ–‡æ¡£çš„æ‰“å°æ¬¡æ•°
+                            mInfo = MsgObj.GetMsgByName("TESTINFO");                            //å–å¾—å®¢æˆ·ç«¯ä¼ æ¥çš„è‡ªå®šä¹‰ä¿¡æ¯
+                            MsgObj.MsgTextClear();
+                            MsgObj.MsgFileClear();
+                            System.out.println("COMMAND:"+mCommand);
+                            if (mCommand.equalsIgnoreCase("INPORTTEXT")) {                      //å¯¼å…¥æ–‡æœ¬å†…å®¹åŠŸèƒ½
+                                if (LoadContent()) {
+                                    MsgObj.SetMsgByName("CONTENT", mContent);
+                                    MsgObj.SetMsgByName("STATUS", "å¯¼å…¥æˆåŠŸ!");                     //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                    MsgObj.MsgError("");                                            //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                                }
+                                else {
+                                    MsgObj.MsgError("å¯¼å…¥å¤±è´¥!");                                   //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                                }
+                            }
+                            else if (mCommand.equalsIgnoreCase("EXPORTTEXT")) {                 //å¯¼å‡ºæ–‡æœ¬å†…å®¹åŠŸèƒ½
+                                if (SaveContent()) {
+                                    MsgObj.SetMsgByName("STATUS", "å¯¼å‡ºæˆåŠŸ!");                     //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                    MsgObj.MsgError("");                                            //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                                }
+                                else {
+                                    MsgObj.MsgError("å¯¼å‡ºå¤±è´¥!");                                   //è®¾ç½®é”™è¯¯ä¿¡
+                                }
+                            }
+                            else if (mCommand.equalsIgnoreCase("WORDTABLE")) {                  //æ’å…¥è¿œç¨‹è¡¨æ ¼åŠŸèƒ½
+                                if (GetWordTable()) {
+                                    MsgObj.SetMsgByName("COLUMNS", String.valueOf(mColumns));       //åˆ—
+                                    MsgObj.SetMsgByName("CELLS", String.valueOf(mCells));           //è¡Œ
+                                    MsgObj.SetMsgByName("WORDCONTENT", mTableContent);              //è¡¨æ ¼å†…å®¹
+                                    MsgObj.SetMsgByName("STATUS", "å¢åŠ å’Œå¡«å……æˆåŠŸæˆåŠŸ!");           //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                    MsgObj.MsgError("");                                            //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                                }
+                                else {
+                                    MsgObj.MsgError("å¢åŠ è¡¨æ ¼è¡Œå¤±è´¥!");                             //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                                }
+                            }
+                            else if (mCommand.equalsIgnoreCase("COPIES")) {                     //æ‰“å°ä»½æ•°æ§åˆ¶åŠŸèƒ½
+                                System.out.println("PRINTS:"+mOfficePrints);
+                                mCopies = Integer.parseInt(mOfficePrints);                        //è·å¾—å®¢æˆ·éœ€è¦æ‰“å°çš„ä»½æ•°
+                                if (mCopies <= 2) {                                               //æ¯”è¾ƒæ‰“å°ä»½æ•°ï¼Œæ‹Ÿå®šè¯¥æ–‡æ¡£å…è®¸æ‰“å°çš„æ€»æ•°ä¸º2ä»½ï¼Œæ³¨ï¼šå¯ä»¥åœ¨æ•°æ®åº“ä¸­è®¾ç½®å¥½æ–‡æ¡£å…è®¸æ‰“å°çš„ä»½æ•°
+                                    if (UpdataCopies(2 - mCopies)) {                                //æ›´æ–°æ‰“å°ä»½æ•°
+                                        MsgObj.SetMsgByName("STATUS", "1");                           //è®¾ç½®çŠ¶æ€ä¿¡æ¯ï¼Œå…è®¸æ‰“å°
+                                        MsgObj.MsgError("");                                          //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                                    }
+                                }
+                                else {
+                                    MsgObj.SetMsgByName("STATUS", "0");                             //ä¸å…è®¸æ‰“å°
+                                    MsgObj.MsgError("è¶…è¿‡æ‰“å°é™åº¦ä¸å…è®¸æ‰“å°!");                     //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                                }
+                            }
+                            else if (mCommand.equalsIgnoreCase("SELFINFO")) {
+                                mInfo = "æœåŠ¡å™¨ç«¯æ”¶åˆ°å®¢æˆ·ç«¯ä¼ æ¥çš„ä¿¡æ¯ï¼šâ€œ" + mInfo + "â€ | ";
+                                mInfo = mInfo + "å½“å‰æœåŠ¡å™¨æ—¶é—´ï¼š" + DbaObj.GetDateTime();        //ç»„åˆè¿”å›ç»™å®¢æˆ·ç«¯çš„ä¿¡æ¯
+                                MsgObj.SetMsgByName("RETURNINFO", mInfo);                         //å°†è¿”å›çš„ä¿¡æ¯è®¾ç½®åˆ°ä¿¡æ¯åŒ…ä¸­
+                            }
+                            else {
+                                MsgObj.MsgError("å®¢æˆ·ç«¯Webå‘é€æ•°æ®åŒ…å‘½ä»¤æ²¡æœ‰åˆé€‚çš„å¤„ç†å‡½æ•°![" + mCommand + "]");
+                                MsgObj.MsgTextClear();
+                                MsgObj.MsgFileClear();
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("SAVEPAGE")) {                      //ä¸‹é¢çš„ä»£ç ä¸ºä¿å­˜ä¸ºå…¨æ–‡æ‰¹æ³¨æ ¼å¼æ–‡ä»¶
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            mFilePath = mFilePath + "\\Document\\" + mRecordID + ".pgf";        //å…¨æ–‡æ‰¹æ³¨æ–‡ä»¶çš„å®Œæ•´è·¯å¾„
+                            if (MsgObj.MsgFileSave(mFilePath)) {                                //ä¿å­˜å…¨æ–‡æ‰¹æ³¨æ–‡ä»¶
+                                MsgObj.SetMsgByName("STATUS", "ä¿å­˜å…¨æ–‡æ‰¹æ³¨æˆåŠŸ!");               //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("ä¿å­˜å…¨æ–‡æ‰¹æ³¨å¤±è´¥!");                             //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+
+                        else if (mOption.equalsIgnoreCase("LOADPAGE")) {                      //ä¸‹é¢çš„ä»£ç ä¸ºè°ƒå…¥å…¨æ–‡æ‰¹æ³¨æ ¼å¼æ–‡ä»¶
+                            mRecordID = MsgObj.GetMsgByName("RECORDID");                        //å–å¾—æ–‡æ¡£ç¼–å·
+                            MsgObj.MsgTextClear();                                              //æ¸…é™¤æ–‡æœ¬ä¿¡æ¯
+                            mFilePath = mFilePath + "\\Document\\" + mRecordID + ".pgf";        //å…¨æ–‡æ‰¹æ³¨æ–‡ä»¶çš„å®Œæ•´è·¯å¾„
+                            if (MsgObj.MsgFileLoad(mFilePath)) {                                //è°ƒå…¥æ–‡æ¡£å†…å®¹
+                                MsgObj.SetMsgByName("STATUS", "æ‰“å¼€å…¨æ–‡æ‰¹æ³¨æˆåŠŸ!");               //è®¾ç½®çŠ¶æ€ä¿¡æ¯
+                                MsgObj.MsgError("");                                              //æ¸…é™¤é”™è¯¯ä¿¡æ¯
+                            }
+                            else {
+                                MsgObj.MsgError("æ‰“å¼€å…¨æ–‡æ‰¹æ³¨å¤±è´¥!");                             //è®¾ç½®é”™è¯¯ä¿¡æ¯
+                            }
+                        }
+                    }
+                    else {
+                        MsgObj.MsgError("å®¢æˆ·ç«¯å‘é€æ•°æ®åŒ…é”™è¯¯!");
+                        MsgObj.MsgTextClear();
+                        MsgObj.MsgFileClear();
+                    }
+                }
+                else {
+                    MsgObj.MsgError("è¯·ä½¿ç”¨Postæ–¹æ³•");
+                    MsgObj.MsgTextClear();
+                    MsgObj.MsgFileClear();
+                }
+                System.out.println("SendPackage");
+                System.out.println("");
+                //SendPackage(response);                                                    //è€ç‰ˆåå°ç±»è¿”å›ä¿¡æ¯åŒ…æ•°æ®æ–¹æ³•
+                MsgObj.Send(response);                                                    //8.1.0.2æ–°ç‰ˆåå°ç±»æ–°å¢çš„åŠŸèƒ½æ¥å£ï¼Œè¿”å›ä¿¡æ¯åŒ…æ•°æ®
+            }
+            catch (Exception e) {
+                System.out.println(e.toString());
+            }
+        }
     }
-  }
 %><%
-  iWebOffice officeServer = new iWebOffice();
-  officeServer.ExecuteRun(request, response);
-  out.clear();                                                                    //ÓÃÓÚ½â¾öJSPÒ³ÃæÖĞ¡°ÒÑ¾­µ÷ÓÃgetOutputStream()¡±ÎÊÌâ
-  out=pageContext.pushBody();                                                     //ÓÃÓÚ½â¾öJSPÒ³ÃæÖĞ¡°ÒÑ¾­µ÷ÓÃgetOutputStream()¡±ÎÊÌâ
+    iWebOffice officeServer = new iWebOffice();
+    officeServer.ExecuteRun(request, response);
+    out.clear();                                                                    //ç”¨äºè§£å†³JSPé¡µé¢ä¸­â€œå·²ç»è°ƒç”¨getOutputStream()â€é—®é¢˜
+    out=pageContext.pushBody();                                                     //ç”¨äºè§£å†³JSPé¡µé¢ä¸­â€œå·²ç»è°ƒç”¨getOutputStream()â€é—®é¢˜
 %>
