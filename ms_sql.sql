@@ -64,3 +64,13 @@ go
 
 insert into oa_patchinfo (patch_editinfo,patch_name,patch_version,patch_time) values('Wanhu ezOFFICE','12.2.0.06_SP_20170731','12.2.0.06',getdate());
 go
+
+
+
+
+
+
+
+
+insert into oa_patchinfo (patch_editinfo,patch_name,patch_version,patch_time) values('Wanhu ezOFFICE','12.2.0.07_SP_20170809','12.2.0.07',getdate());
+go

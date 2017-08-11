@@ -53,6 +53,8 @@ if(!"".equals(userId)){
 	
 	boolean isRightVideoView=managerBD.hasRight(userId, "vCf*01*03");//视频会议查看权限 
 	boolean isRightVideoSet=managerBD.hasRight(userId, "vCf*01*04");//视频会议设置权限 
+	
+	boolean isRightPersonSetup = managerBD.hasRight(userId, "08*03*02");//视频会议设置权限 
 %>
 
 <script>	
@@ -62,15 +64,16 @@ if(!"".equals(userId)){
 			// <!-- 联系人 [BEGIN] -->
         <%  
             boolean authFlag1=cmBD.hasMenuAuth("workmanager_linkman",userId,orgId);
-            //if(canShowMenus.indexOf("workmanager_linkman")!=-1 && authFlag1==true){
+          //  if(canShowMenus.indexOf("workmanager_linkman")!=-1 && authFlag1==true){
+        
 			if(1==1){
-        %>
+		%>
                
 			  <%
                             boolean authFlag3=cmBD.hasMenuAuth("workmanager_linkman_inner",userId,orgId);
-                            //if(canShowMenus.indexOf("workmanager_linkman_inner")>=0 && authFlag3==true){
+                          // if(canShowMenus.indexOf("workmanager_linkman_inner")>=0 && authFlag3==true){
 							if(1==1){
-                        %>
+						%>
 			 {id:100000, expNodeCode:"innerPersonList", pId:-1, name:"<%=Resource.getValue(whir_locale, "personalwork", "personalwork.innercontact")%>", target:"mainFrame",iconSkin:"fa fa",click:"menuJump('<%=rootPath%>/PersonInnerAction!innerPersonList.action?rightNeedDiv=1')"}
 																		
 			  <%
@@ -102,7 +105,7 @@ if(!"".equals(userId)){
                             boolean authFlag4=cmBD.hasMenuAuth("workmanager_linkman_public",userId,orgId);
 							
 							authFlag4=false;//公共联系人去除
-                            //if(canShowMenus.indexOf("workmanager_linkman_public")>=0 && authFlag4==true){
+                           // if(canShowMenus.indexOf("workmanager_linkman_public")>=0 && authFlag4==true){
 							if(1!=1){
 						%>
                                 ,{id:1000002, iconSkin:"fa fa-cog fa",pId:-1, name:"<%=Resource.getValue(whir_locale, "personalwork", "personalwork.pubcontact")%>", url:"<%=rootPath%>/PersonOwnAction!personList.action?classType=public", target:"mainFrame"}
@@ -134,7 +137,7 @@ if(!"".equals(userId)){
                         %>
                         <%  
                             boolean authFlag5=cmBD.hasMenuAuth("workmanager_linkman_private",userId,orgId);
-                           // if(canShowMenus.indexOf("workmanager_linkman_private")>=0 && authFlag5==true){
+                            //if(canShowMenus.indexOf("workmanager_linkman_private")>=0 && authFlag5==true){
 							if(1==1){
 						%>
                                 ,{id:1000003,iconSkin:"fa fa-cog fa", pId:-1, name:"<%=Resource.getValue(whir_locale, "personalwork", "personalwork.percontact")%>",  target:"mainFrame", click:"menuJump('<%=rootPath%>/PersonOwnAction!personList.action?classType=private&rightNeedDiv=1')"}
@@ -188,14 +191,18 @@ if(!"".equals(userId)){
 								
 						 ,{id:1000001123, pId:-1, name:"<%=Resource.getValue(whir_locale, "personalwork", "personalwork.customgroup")%>", click:"menuJump('<%=rootPath%>/Group!initList.action?groupType=1&rightNeedDiv=1')", target:"mainFrame",iconSkin:"fa fa"}
                         <%
-                            if(isForbiddenPad && mBD.hasRight(userId,"00*01*01")){
+                           // if(isForbiddenPad && mBD.hasRight(userId,"00*01*01")){
                                 // "联系人设置"栏目在IPAD上不显示
                                 // Added by Qian Min for ezOFFICE 11.0.0.11 at 2013-10-12 
                         %>
+						<%if(isRightPersonSetup||isright||isRightVideoSet||(isForbiddenPad && managerBD.hasRightTypeName(userId,"短信", "设置"))||managerBD.hasRightTypeName(userId,"短信", "统计")){%>
                                 ,{id:1000004, pId:-1, name:"<%=Resource.getValue(whir_locale, "personalwork", "personalwork.personal.setting")%>", target:"mainFrame",iconSkin:"fa fa"}
+								<%}%>
+								<%if(isRightPersonSetup){%>
 									,{id:10000041, pId:1000004, name:"浏览范围",  target:"mainFrame",iconSkin:"fa fa",click:"menuJump('<%=rootPath%>/PersonSetupAction!setupList.action?rightNeedDiv=1')"}
+									<%} %>
 									<%if (isright){ %>
-									,{id:10000042, pId:1000004, name:"电话会议设置", url:"<%=rootPath%>/TeleConferenceAction!teleConferenceSet.action", target:"mainFrame",iconSkin:"fa fa",click:"menuJump('<%=rootPath%>/TeleConferenceAction!teleConferenceSet.action?rightNeedDiv=1')"}
+									,{id:10000042, pId:1000004, name:"电话会议设置",  target:"mainFrame",iconSkin:"fa fa",click:"menuJump('<%=rootPath%>/TeleConferenceAction!teleConferenceSet.action?rightNeedDiv=1')"}
 									,{id:10000043, pId:1000004, name:"电话会议统计", target:"mainFrame",iconSkin:"fa fa",click:"menuJump('<%=rootPath%>/TeleConferenceAction!teleConference_list.action?rightNeedDiv=1&Statistics=yes')"}
 									<%} %>
 									<%if (isRightVideoSet){ %>
@@ -212,7 +219,7 @@ if(!"".equals(userId)){
 											<%}%>
 									<%}%>			
                         <%
-                            }
+                            //}
                         %>
 				 <%
             }
