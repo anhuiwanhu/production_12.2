@@ -53,6 +53,12 @@
                             <i class="fa fa-angle-right close-search"></i>
                         </p>
                         <div class="form-horizontal"> 
+						     <div class="form-group">
+                                <label for="" class="col-wh-3 control-label">员工编号：</label>
+                                <div class="form-group col-wh-9 nopright">					   
+									   <input type="text" class="form-control" id="employeeNumberPara" name="employeeNumberPara" />
+                                </div>
+                            </div>
 							<div class="form-group">
                                 <label for="" class="col-wh-3 control-label">考勤状态：</label>
                                 <div class="form-group col-wh-9 nopright">					   
