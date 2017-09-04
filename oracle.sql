@@ -108,3 +108,19 @@ commit;
 
 insert into oa_patchinfo (patch_id,patch_editinfo,patch_name,patch_version,patch_time) values(hibernate_sequence.nextval,'Wanhu ezOFFICE','12.2.0.08_SP_20170814','12.2.0.08',sysdate);
 commit;
+
+
+
+
+
+
+
+
+
+
+
+--增加长度
+alter table hr_kq_rule modify rulealerttype varchar2(20);
+commit;
+insert into oa_patchinfo (patch_id,patch_editinfo,patch_name,patch_version,patch_time) values(hibernate_sequence.nextval,'Wanhu ezOFFICE','12.2.0.09_SP_20170826','12.2.0.09',sysdate);
+commit;

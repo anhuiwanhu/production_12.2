@@ -85,3 +85,18 @@ go
 
 insert into oa_patchinfo (patch_editinfo,patch_name,patch_version,patch_time) values('Wanhu ezOFFICE','12.2.0.08_SP_20170814','12.2.0.08',getdate());
 go
+
+
+
+
+
+
+
+
+alter table Signature alter column marktype  nvarchar(100);
+go
+--增加长度
+ALTER TABLE hr_kq_rule ALTER COLUMN rulealerttype NVARCHAR(20);
+go
+insert into oa_patchinfo (patch_editinfo,patch_name,patch_version,patch_time) values('Wanhu ezOFFICE','12.2.0.09_SP_20170826','12.2.0.09',getdate());
+go
